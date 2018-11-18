@@ -1,6 +1,5 @@
 {
   "id": "npm-test/master",
-  "mode": "npm",
   "source": {
     "remote": {
       "branch": "master",
@@ -9,8 +8,12 @@
     }
   },
   "build": {
-    "cmd_name": "build:deploy-root",
-    "dist_name": "dist"
+    "npm": {
+      "cmd_name": "build:deploy-root",
+      "folder_names": [
+        "dist"
+      ]
+    }
   },
   "publish": {
     "folder": {
