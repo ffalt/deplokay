@@ -34,7 +34,7 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 		await this.emit(EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
 		const result = await shellExec(`npm install --production -s --no-color -no-audit`, {cwd: destDir});
 		await this.emit(EmitType.SUCCESS, 'generating', result.stdout || '');
-		fse.remove(path.resolve(destDir, 'node_modules'));
+		await fse.remove(path.resolve(destDir, 'node_modules'));
 	}
 
 	async run(opts: CombineReleaseOptions): Promise<void> {
@@ -62,11 +62,11 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 		if (copied.length === 0) {
 			return Promise.reject('Release folder is empty.');
 		} else {
+			if (opts.GENERATE_SLIM_PACKAGE) {
+				await this.configureNPMJson(opts.SOURCE_DIR, opts.RELEASE_DIR);
+			}
 			await this.emit(EmitType.SUCCESS, 'generated', copied.join('\n'));
 		}
 
-		if (opts.GENERATE_SLIM_PACKAGE) {
-			await this.configureNPMJson(opts.SOURCE_DIR, opts.RELEASE_DIR);
-		}
 	}
 }
