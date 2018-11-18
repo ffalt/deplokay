@@ -18,19 +18,21 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 	private async configureNPMJson(soureDir: string, destDir: string): Promise<void> {
 		const manifest = await getManifest(soureDir, true);
 		await this.emit(EmitType.OPERATION, 'writing', `Writing ${'package.json'}`);
-		const pack: { [key: string]: any } = {};
-		Object.keys(manifest).forEach(key => {
-			if (['name', 'version', 'author', 'license', 'description', 'bin', 'repository', 'dependencies', 'engines'].indexOf(key) >= 0) {
-				pack[key] = manifest[key];
-			}
-		});
-		pack.scripts = {};
-		Object.keys(manifest.scripts).forEach(key => {
-			if (['start'].indexOf(key) >= 0 || key.indexOf('cmd:') === 0) {
-				pack.scripts[key] = manifest.scripts[key];
-			}
-		});
-		await fse.writeFile(path.resolve(destDir, 'package.json'), JSON.stringify(pack, null, '\t'));
+		delete manifest.devDependencies;
+		// const pack: { [key: string]: any } = {};
+		//
+		// Object.keys(manifest).forEach(key => {
+		// 	if (['devDependencies'].indexOf(key) < 0) {
+		// 		pack[key] = manifest[key];
+		// 	}
+		// });
+		// pack.scripts = {};
+		// Object.keys(manifest.scripts).forEach(key => {
+		// 	if (['start'].indexOf(key) >= 0 || key.indexOf('cmd:') === 0) {
+		// 		pack.scripts[key] = manifest.scripts[key];
+		// 	}
+		// });
+		await fse.writeFile(path.resolve(destDir, 'package.json'), JSON.stringify(manifest, null, '\t'));
 		await this.emit(EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
 		const result = await shellExec(`npm install --production -s --no-color -no-audit`, {cwd: destDir});
 		await this.emit(EmitType.SUCCESS, 'generating', result.stdout || '');
