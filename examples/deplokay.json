@@ -1,0 +1,39 @@
+{
+  "id": "deplokay/master",
+  "mode": "npm",
+  "source": {
+    "local": {
+      "path": "."
+    },
+    "r-emote": {
+      "branch": "master",
+      "repository": "https://github.com/ffalt/deplokay.git",
+      "checkout_path": "./data/deplokay/build"
+    }
+  },
+  "build": {
+    "npm": {
+      "cmd_name": "build:deploy",
+      "slim_package": true,
+      "component_names": [
+        "dist",
+        "bin",
+        "src",
+        "LICENSE",
+        "package.json",
+        "README.md"
+      ]
+    }
+  },
+  "publish": {
+    "folder": {
+      "path": "./data/deplokay/current"
+    },
+    "archive": {
+      "path": "./data/deplokay/archives"
+    },
+    "branch": {
+      "branch": "releases"
+    }
+  }
+}
