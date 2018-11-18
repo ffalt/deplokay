@@ -1,0 +1,50 @@
+{
+	"name": "deplokay",
+	"version": "0.0.1",
+	"description": "deplokay is a deployment helper (CLI/Library) for node. Build a git repository with jekyll, hugo or npm & deploy to a folder, archive or branch",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "tsc -m commonjs --outDir dist",
+		"clean": "rimraf ./dist",
+		"lint": "tslint --project tsconfig.json \"src/**/*.ts\"",
+		"build:deploy": "npm run clean && npm run build",
+		"deploy": "node bin/deplokay.js -c examples/deplokay.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ffalt/deplokay.git"
+	},
+	"bin": {
+		"deplokay": "bin/deplokay.js"
+	},
+	"keywords": [
+		"git",
+		"tag",
+		"release",
+		"jekyll",
+		"hugo",
+		"build",
+		"branch"
+	],
+	"author": "ffalt",
+	"license": "MIT",
+	"engines": {
+		"node": ">=8.0.0"
+	},
+	"dependencies": {
+		"archiver": "^3.0.0",
+		"chalk": "^2.4.1",
+		"commander": "^2.19.0",
+		"download": "^7.1.0",
+		"fs-extra": "^7.0.1",
+		"git-url-parse": "^6.0.3",
+		"inquirer": "^6.2.0",
+		"ora": "^3.0.0",
+		"semver": "^5.1.0",
+		"shelljs": "^0.7.0",
+		"simple-git": "^1.107.0",
+		"tmp-promise": "^1.0.5"
+	}
+}
