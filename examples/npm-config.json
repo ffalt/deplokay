@@ -1,0 +1,26 @@
+{
+  "id": "npm-test/master",
+  "mode": "npm",
+  "source": {
+    "remote": {
+      "branch": "master",
+      "repository": "https://github.com/ffalt/mah.git",
+      "checkout_path": "./data/npm-test/build"
+    }
+  },
+  "build": {
+    "cmd_name": "build:deploy-root",
+    "dist_name": "dist"
+  },
+  "publish": {
+    "folder": {
+      "path": "./data/npm-test/site"
+    },
+    "archive": {
+      "path": "./data/npm-test/archives"
+    },
+    "branch": {
+      "branch": "releases"
+    }
+  }
+}

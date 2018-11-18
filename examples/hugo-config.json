@@ -1,0 +1,23 @@
+{
+  "id": "hugo-test/master",
+  "mode": "hugo",
+  "source": {
+    "remote": {
+      "branch": "master",
+      "repository": "https://github.com/gohugoio/hugoDocs.git",
+      "checkout_path": "./data/hugo-test/build"
+    }
+  },
+  "build": {
+    "hugo": {}
+  },
+  "publish": {
+    "folder": {
+      "path": "./data/hugo-test/site"
+    },
+    "archive": {
+      "name": "hugo-test",
+      "path": "./data/hugo-test/archives"
+    }
+  }
+}

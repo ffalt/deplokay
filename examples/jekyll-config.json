@@ -1,0 +1,25 @@
+{
+  "id": "jekyll-test/master",
+  "source": {
+    "remote": {
+      "branch": "gh-pages",
+      "repository": "https://github.com/daigofuji/jekyll-foundation-6-starter.git",
+      "checkout_path": "./data/jekyll-test/build"
+    }
+  },
+  "build": {
+    "jekyll": {}
+  },
+  "publish": {
+    "folder": {
+      "path": "./data/jekyll-test/site"
+    },
+    "archive": {
+      "name": "jekyll-test",
+      "path": "./data/jekyll-test/archives"
+    }
+  },
+  "env": {
+    "JEKYLL_ENV": "production"
+  }
+}
