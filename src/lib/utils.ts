@@ -1,13 +1,13 @@
 import simplegit from 'simple-git/promise';
 import path from 'path';
-import util from 'util';
 import fse from 'fs-extra';
 import semver from 'semver';
-import {EmitType} from './index';
-import {BuildHugoOptions} from './run/build-hugo';
+import {spawn, SpawnOptions} from 'child_process';
 
 const SimpleGit = require('simple-git/promise');
-const exec = util.promisify(require('child_process').exec);
+// import util from 'util';
+// const execOrg = require('child_process').exec;
+// const exec = util.promisify(execOrg);
 
 export async function cloneLocalGit(git: simplegit.SimpleGit, sourceDir: string, destDir: string): Promise<simplegit.SimpleGit> {
 	const remoteUrl = await getRemoteUrl(git);
@@ -45,10 +45,6 @@ export async function createAndPushEmptyBranch(git: simplegit.SimpleGit, destDir
 	await git.raw(['push', '-u', 'origin', branch]);
 }
 
-export async function runBuild(buildCmd: string, buildDir: string): Promise<{ stdout: string, stderr: string }> {
-	return await shellExec(`npm run ${buildCmd}`, {cwd: buildDir});
-}
-
 export async function getGitSummary(gitDir: string): Promise<{ version: string; name: string; }> {
 	const git = new SimpleGit(gitDir);
 	git.silent(true);
@@ -75,11 +71,6 @@ export async function getGitSummary(gitDir: string): Promise<{ version: string; 
 	return {version: version.trim(), name: name.trim()};
 }
 
-export interface ShellExecOptions {
-	cwd: string;
-	env?: { [name: string]: any };
-}
-
 export async function getManifest(dir: string, skipSemverClean?: boolean): Promise<any> {
 	const manifest = await fse.readJson(path.resolve(dir, 'package.json'));
 	if (!skipSemverClean) {
@@ -93,13 +84,53 @@ export async function getManifestVersion(dir: string): Promise<string> {
 	return manifest.version;
 }
 
-export async function shellExec(cmd: string, options: ShellExecOptions): Promise<{ stdout: string, stderr: string }> {
-	const {stdout, stderr, error} = await exec(cmd, options);
-	if (error) {
-		throw new Error(error);
-	}
-	return {stderr: (stderr || '').trim(), stdout: (stdout || '').trim()};
+// export interface ShellExecOptions {
+// 	cwd: string;
+// 	env?: { [name: string]: any };
+// }
+// export async function shellExec(cmd: string, options: ShellExecOptions): Promise<{ stdout: string, stderr: string }> {
+// 	const {stdout, stderr, error} = await exec(cmd, options);
+// 	if (error) {
+// 		throw new Error(error);
+// 	}
+// 	return {stderr: (stderr || '').trim(), stdout: (stdout || '').trim()};
+// }
+
+export async function shellSpawn(cmd: string, args: Array<string>, options: SpawnOptions, onDataLine: (s: string) => void): Promise<void> {
+	return new Promise<void>((resolve, reject) => {
+
+		const ls = spawn(cmd, args, options);
+		let error = '';
+		let result = '';
+		ls.stdout.on('data', (data) => {
+			result += data.toString();
+			const sl = result.split('\n');
+			if (sl.length > 1) {
+				for (let i = 0; i < sl.length - 1; i++) {
+					if (sl[i].length > 0)
+						onDataLine(sl[i]);
+				}
+				result = sl[sl.length - 1];
+			}
+		});
+
+		ls.stderr.on('data', (data) => {
+			error += data.toString();
+		});
+
+		ls.on('close', (code) => {
+			if (result.length > 0) {
+				onDataLine(result);
+			}
+			if (code !== 0) {
+				reject(error);
+			} else {
+				resolve();
+			}
+		});
+	});
 }
+
 
 export function buildEnv(envExtra?: { [name: string]: string }): { [name: string]: any } {
 	if (!envExtra) {

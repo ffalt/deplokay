@@ -41,7 +41,6 @@
     "fs-extra": "^7.0.1",
     "git-url-parse": "^6.0.3",
     "inquirer": "^6.2.0",
-    "ora": "^3.0.0",
     "semver": "^5.1.0",
     "shelljs": "^0.7.0",
     "simple-git": "^1.107.0",

@@ -1,7 +1,7 @@
 import path from 'path';
 import fse from 'fs-extra';
 import {EmitType} from '..';
-import {buildEnv, shellExec, ShellExecOptions} from '../utils';
+import {buildEnv, shellSpawn} from '../utils';
 import {Run} from './run-base';
 
 export interface BuildJekyllOptions {
@@ -33,7 +33,18 @@ export class BuildJekyllRun extends Run<BuildJekyllOptions> {
 		const gemfile = path.resolve(opts.BUILD_SOURCE_DIR, 'Gemfile');
 		await this.ensureGemfile(gemfile);
 		exec_options.env['BUNDLE_GEMFILE'] = gemfile;
-		let result = await this.execute(`bundle exec jekyll build -d ${opts.BUILD_DEST_DIR}`, exec_options);
+		let result = '';
+		try {
+			await shellSpawn('bundle', ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s: string) => {
+				result += s + '\n';
+				this.emit(EmitType.LOG, '', s);
+			});
+		} catch (e) {
+			if (e) {
+				result += e.toString();
+			}
+		}
+		// let result = await this.execute(`bundle exec jekyll build -d ${opts.BUILD_DEST_DIR}`, exec_options);
 		if (this.hasBuildErrorMsg(result)) {
 			if (result.indexOf('Generating... \n') >= 0) {
 				result = result.split('Generating... \n')[1];
@@ -49,7 +60,7 @@ export class BuildJekyllRun extends Run<BuildJekyllOptions> {
 				result = result.split('done.')[0];
 			}
 		}
-		await this.emit(EmitType.SUCCESS, 'build', result);
+		await this.emit(EmitType.SUCCESS, 'build', '');
 	}
 
 	private async ensureGemfile(gemfile: string): Promise<void> {
@@ -60,12 +71,6 @@ gem 'jekyll'
 gem 'github-pages'`;
 			await fse.writeFile(gemfile, gem);
 		}
-	}
-
-	private async execute(cmd: string, exec_options: ShellExecOptions): Promise<string> {
-		const {stdout, stderr} = await shellExec(cmd, exec_options);
-		const result = (stdout || '') + (stderr || '');
-		return result.replace(/\[31m /g, '').replace(/\[0m/g, '');
 	}
 
 	private async install(opts: BuildJekyllOptions): Promise<void> {
@@ -81,11 +86,15 @@ gem 'github-pages'`;
 			cwd: opts.BUILD_SOURCE_DIR,
 			env: buildEnv(opts.BUILD_ENV)
 		};
-		const result = await this.execute(`bundle install --gemfile=${gemfile} --path ${jekyll_dir}`, exec_options);
+		let result = '';
+		await shellSpawn('bundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s: string) => {
+			result += s + '\n';
+			this.emit(EmitType.LOG, '', s);
+		});
 		if (this.hasInstallErrorMsg(result)) {
 			return Promise.reject(result);
 		}
-		await this.emit(EmitType.SUCCESS, 'installed', result);
+		await this.emit(EmitType.SUCCESS, 'installed', '');
 	}
 
 	async run(opts: BuildJekyllOptions): Promise<void> {
