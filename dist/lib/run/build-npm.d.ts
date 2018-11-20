@@ -8,8 +8,7 @@ export interface BuildNPMOptions {
 }
 export declare class BuildNPMRun extends Run<BuildNPMOptions> {
     private buildEnv;
-    private build;
-    private execute;
     private install;
+    private build;
     run(opts: BuildNPMOptions): Promise<void>;
 }

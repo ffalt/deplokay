@@ -24,8 +24,10 @@ class CombineReleaseRun extends run_base_1.Run {
             delete manifest.devDependencies;
             yield fs_extra_1.default.writeFile(path_1.default.resolve(destDir, 'package.json'), JSON.stringify(manifest, null, '\t'));
             yield this.emit(__1.EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
-            const result = yield utils_1.shellExec(`npm install --production -s --no-color -no-audit`, { cwd: destDir });
-            yield this.emit(__1.EmitType.SUCCESS, 'generating', result.stdout || '');
+            yield utils_1.shellSpawn('npm', ['install', '--production', '--no-color', '-no-audit'], { cwd: destDir }, (s) => {
+                this.emit(__1.EmitType.LOG, '', s);
+            });
+            yield this.emit(__1.EmitType.SUCCESS, 'generating', '');
             yield fs_extra_1.default.remove(path_1.default.resolve(destDir, 'node_modules'));
         });
     }
@@ -39,6 +41,7 @@ class CombineReleaseRun extends run_base_1.Run {
                     for (const subentry of list) {
                         yield fs_extra_1.default.copy(path_1.default.resolve(opts.SOURCE_DIR, entry, subentry), path_1.default.resolve(opts.RELEASE_DIR, subentry));
                         copied.push(subentry);
+                        yield this.emit(__1.EmitType.LOG, '', subentry);
                     }
                 }
             }
@@ -47,6 +50,7 @@ class CombineReleaseRun extends run_base_1.Run {
                     yield this.emit(__1.EmitType.OPERATION, 'copying', `Copying component ${entry}`);
                     yield fs_extra_1.default.copy(path_1.default.resolve(opts.SOURCE_DIR, entry), path_1.default.resolve(opts.RELEASE_DIR, entry));
                     copied.push(entry);
+                    yield this.emit(__1.EmitType.LOG, '', entry);
                 }
             }
             if (copied.length === 0) {
@@ -56,7 +60,7 @@ class CombineReleaseRun extends run_base_1.Run {
                 if (opts.GENERATE_SLIM_PACKAGE) {
                     yield this.configureNPMJson(opts.SOURCE_DIR, opts.RELEASE_DIR);
                 }
-                yield this.emit(__1.EmitType.SUCCESS, 'generated', copied.join('\n'));
+                yield this.emit(__1.EmitType.SUCCESS, 'generated', '');
             }
         });
     }

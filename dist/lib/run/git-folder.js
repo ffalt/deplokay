@@ -25,6 +25,11 @@ class GitFolderRun extends run_base_1.Run {
                 return Promise.reject(`Directory ${opts.GIT_DIR} must exist`);
             }
             const git = new SimpleGit(opts.GIT_DIR);
+            git.outputHandler((command, stdout, stderr) => {
+                stdout.on('data', (data) => {
+                    this.emit(__1.EmitType.LOG, '', data.toString());
+                });
+            });
             exists = yield fs_extra_1.default.pathExists(path_1.default.resolve(opts.GIT_DIR, '.git'));
             if (!exists) {
                 yield this.emit(__1.EmitType.OPERATION, 'cloning', `Cloning repo ${opts.GIT_REPO} to ${opts.GIT_DIR}`);

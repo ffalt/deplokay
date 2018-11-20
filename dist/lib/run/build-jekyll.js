@@ -34,7 +34,18 @@ class BuildJekyllRun extends run_base_1.Run {
             const gemfile = path_1.default.resolve(opts.BUILD_SOURCE_DIR, 'Gemfile');
             yield this.ensureGemfile(gemfile);
             exec_options.env['BUNDLE_GEMFILE'] = gemfile;
-            let result = yield this.execute(`bundle exec jekyll build -d ${opts.BUILD_DEST_DIR}`, exec_options);
+            let result = '';
+            try {
+                yield utils_1.shellSpawn('bundle', ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s) => {
+                    result += s + '\n';
+                    this.emit(__1.EmitType.LOG, '', s);
+                });
+            }
+            catch (e) {
+                if (e) {
+                    result += e.toString();
+                }
+            }
             if (this.hasBuildErrorMsg(result)) {
                 if (result.indexOf('Generating... \n') >= 0) {
                     result = result.split('Generating... \n')[1];
@@ -50,7 +61,7 @@ class BuildJekyllRun extends run_base_1.Run {
                     result = result.split('done.')[0];
                 }
             }
-            yield this.emit(__1.EmitType.SUCCESS, 'build', result);
+            yield this.emit(__1.EmitType.SUCCESS, 'build', '');
         });
     }
     ensureGemfile(gemfile) {
@@ -64,13 +75,6 @@ gem 'github-pages'`;
             }
         });
     }
-    execute(cmd, exec_options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { stdout, stderr } = yield utils_1.shellExec(cmd, exec_options);
-            const result = (stdout || '') + (stderr || '');
-            return result.replace(/\[31m /g, '').replace(/\[0m/g, '');
-        });
-    }
     install(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const gemfile = path_1.default.resolve(opts.BUILD_SOURCE_DIR, 'Gemfile');
@@ -81,11 +85,15 @@ gem 'github-pages'`;
                 cwd: opts.BUILD_SOURCE_DIR,
                 env: utils_1.buildEnv(opts.BUILD_ENV)
             };
-            const result = yield this.execute(`bundle install --gemfile=${gemfile} --path ${jekyll_dir}`, exec_options);
+            let result = '';
+            yield utils_1.shellSpawn('bundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s) => {
+                result += s + '\n';
+                this.emit(__1.EmitType.LOG, '', s);
+            });
             if (this.hasInstallErrorMsg(result)) {
                 return Promise.reject(result);
             }
-            yield this.emit(__1.EmitType.SUCCESS, 'installed', result);
+            yield this.emit(__1.EmitType.SUCCESS, 'installed', '');
         });
     }
     run(opts) {

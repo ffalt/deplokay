@@ -1,6 +1,6 @@
 import path from 'path';
 import fse from 'fs-extra';
-import {buildEnv, shellExec, ShellExecOptions} from '../utils';
+import {buildEnv, shellSpawn} from '../utils';
 import {Run} from './run-base';
 import download from 'download';
 import {EmitType} from '../index';
@@ -26,21 +26,18 @@ export class BuildHugoRun extends Run<BuildHugoOptions> {
 			env: buildEnv(opts.BUILD_ENV)
 		};
 		const hugo = path.resolve(opts.BUILD_SOURCE_DIR, './.hugo/hugo') + (process.platform === 'win32' ? '.exe' : '');
-		await this.execute(hugo + ` -d ${opts.BUILD_DEST_DIR}`, exec_options);
-	}
-
-	private async execute(cmd: string, exec_options: ShellExecOptions): Promise<string> {
-		const {stdout, stderr} = await shellExec(cmd, exec_options);
-		const result = (stdout || '') + (stderr || '');
-		return result;
+		await shellSpawn(hugo, ['-d', opts.BUILD_DEST_DIR], exec_options, (s: string) => {
+			this.emit(EmitType.LOG, '', s);
+		});
+		await this.emit(EmitType.SUCCESS, 'build', '');
 	}
 
 	private async download(url: string, opts: BuildHugoOptions): Promise<void> {
 		const hugo_dir = path.resolve(opts.BUILD_SOURCE_DIR, '.hugo');
 		await fse.ensureDir(hugo_dir);
-		await this.emit(EmitType.OPERATION, 'installing', `Installing Hugo into ${hugo_dir}`);
+		await this.emit(EmitType.OPERATION, 'installing', `Installing Hugo ${opts.BUILD_EXTENDED ? 'extended ' : ''}into ${hugo_dir}`);
 		await download(url, hugo_dir, {extract: true});
-		await this.emit(EmitType.SUCCESS, 'installed', 'Hugo downloaded');
+		await this.emit(EmitType.SUCCESS, 'installed', '');
 	}
 
 	private async installSimple(opts: BuildHugoOptions): Promise<void> {

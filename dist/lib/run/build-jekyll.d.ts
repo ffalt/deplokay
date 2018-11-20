@@ -11,7 +11,6 @@ export declare class BuildJekyllRun extends Run<BuildJekyllOptions> {
     private hasInstallErrorMsg;
     private build;
     private ensureGemfile;
-    private execute;
     private install;
     run(opts: BuildJekyllOptions): Promise<void>;
 }

@@ -20,9 +20,6 @@ const npm_git_publish_1 = require("../lib/action/npm-git-publish");
 const jekyll_git_publish_1 = require("../lib/action/jekyll-git-publish");
 const hugo_git_publish_1 = require("../lib/action/hugo-git-publish");
 const consts_1 = require("../consts");
-const ora = require('ora');
-const spinner = ora('dots', { stream: process.stdout });
-const spinEnabled = process.stdout.isTTY;
 const manifest = require(path_1.default.resolve(__dirname, '../../package.json'));
 function parameterList(str, list) {
     list.push(str);
@@ -35,6 +32,11 @@ class DeplokayCLI {
     emit(task, type, state, details) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (type) {
+                case index_1.EmitType.LOG:
+                    if (details.length > 0) {
+                        console.log(' ', chalk_1.default.gray(details));
+                    }
+                    return;
                 case index_1.EmitType.DONE:
                     state = chalk_1.default.green(state);
                     break;
@@ -48,26 +50,13 @@ class DeplokayCLI {
                     state = chalk_1.default.cyan(state);
                     break;
                 case index_1.EmitType.SUCCESS:
-                    state = chalk_1.default.cyan(state);
+                    state = chalk_1.default.greenBright(state);
                     details = chalk_1.default.gray(details);
                     break;
             }
-            if (spinEnabled && spinner.isSpinning) {
-                if (type !== index_1.EmitType.ERROR) {
-                    spinner.succeed();
-                }
-                else {
-                    spinner.fail();
-                }
-            }
             const taskPrefix = task.id ? `[${task.id}] ` : '';
-            const line = `${taskPrefix}${state}${(type === index_1.EmitType.SUCCESS ? '\n' : ' ')}${details}`;
-            if (spinEnabled && type !== index_1.EmitType.ERROR && type !== index_1.EmitType.FINISH) {
-                spinner.start(line);
-            }
-            else {
-                console.log(line);
-            }
+            const line = `${taskPrefix}${state}${(type === index_1.EmitType.SUCCESS && (details.length > 0) ? '\n' : ' ')}${details}`;
+            console.log(line);
         });
     }
     programOptions(prog) {

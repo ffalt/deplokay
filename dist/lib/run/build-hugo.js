@@ -27,23 +27,19 @@ class BuildHugoRun extends run_base_1.Run {
                 env: utils_1.buildEnv(opts.BUILD_ENV)
             };
             const hugo = path_1.default.resolve(opts.BUILD_SOURCE_DIR, './.hugo/hugo') + (process.platform === 'win32' ? '.exe' : '');
-            yield this.execute(hugo + ` -d ${opts.BUILD_DEST_DIR}`, exec_options);
-        });
-    }
-    execute(cmd, exec_options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { stdout, stderr } = yield utils_1.shellExec(cmd, exec_options);
-            const result = (stdout || '') + (stderr || '');
-            return result;
+            yield utils_1.shellSpawn(hugo, ['-d', opts.BUILD_DEST_DIR], exec_options, (s) => {
+                this.emit(index_1.EmitType.LOG, '', s);
+            });
+            yield this.emit(index_1.EmitType.SUCCESS, 'build', '');
         });
     }
     download(url, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const hugo_dir = path_1.default.resolve(opts.BUILD_SOURCE_DIR, '.hugo');
             yield fs_extra_1.default.ensureDir(hugo_dir);
-            yield this.emit(index_1.EmitType.OPERATION, 'installing', `Installing Hugo into ${hugo_dir}`);
+            yield this.emit(index_1.EmitType.OPERATION, 'installing', `Installing Hugo ${opts.BUILD_EXTENDED ? 'extended ' : ''}into ${hugo_dir}`);
             yield download_1.default(url, hugo_dir, { extract: true });
-            yield this.emit(index_1.EmitType.SUCCESS, 'installed', 'Hugo downloaded');
+            yield this.emit(index_1.EmitType.SUCCESS, 'installed', '');
         });
     }
     installSimple(opts) {

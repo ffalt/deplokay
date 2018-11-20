@@ -16,32 +16,30 @@ class BuildNPMRun extends run_base_1.Run {
         const env = Object.assign({ 'NODE_DISABLE_COLORS': 'true' }, opts.BUILD_ENV || {});
         return utils_1.buildEnv(env);
     }
-    build(opts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.emit(__1.EmitType.OPERATION, 'building', `Building with NPM ${opts.BUILD_CMD} in ${opts.BUILD_SOURCE_DIR}`);
-            const exec_options = {
-                cwd: opts.BUILD_SOURCE_DIR,
-                env: this.buildEnv(opts)
-            };
-            const result = yield this.execute(`npm run --no-color ${opts.BUILD_CMD}`, exec_options);
-            yield this.emit(__1.EmitType.SUCCESS, 'build', result);
-        });
-    }
-    execute(cmd, exec_options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { stdout } = yield utils_1.shellExec(cmd, exec_options);
-            return (stdout || '');
-        });
-    }
     install(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.emit(__1.EmitType.OPERATION, 'installing', `Installing npm dependencies`);
-            const exec_options = {
+            const spawn_options = {
                 cwd: opts.BUILD_SOURCE_DIR,
                 env: this.buildEnv(opts)
             };
-            const result = yield this.execute(`npm install -s --no-color -no-audit`, exec_options);
-            yield this.emit(__1.EmitType.SUCCESS, 'installed', result);
+            yield utils_1.shellSpawn('npm', ['install', '--no-color', '-no-audit'], spawn_options, (s) => {
+                this.emit(__1.EmitType.LOG, '', s);
+            });
+            yield this.emit(__1.EmitType.SUCCESS, 'installed', '');
+        });
+    }
+    build(opts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.emit(__1.EmitType.OPERATION, 'building', `Building with NPM ${opts.BUILD_CMD} in ${opts.BUILD_SOURCE_DIR}`);
+            const spawn_options = {
+                cwd: opts.BUILD_SOURCE_DIR,
+                env: this.buildEnv(opts)
+            };
+            yield utils_1.shellSpawn('npm', ['run', '--no-color', opts.BUILD_CMD], spawn_options, (s) => {
+                this.emit(__1.EmitType.LOG, '', s);
+            });
+            yield this.emit(__1.EmitType.SUCCESS, 'build', '');
         });
     }
     run(opts) {

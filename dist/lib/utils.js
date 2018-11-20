@@ -12,11 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
-const util_1 = __importDefault(require("util"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const semver_1 = __importDefault(require("semver"));
+const child_process_1 = require("child_process");
 const SimpleGit = require('simple-git/promise');
-const exec = util_1.default.promisify(require('child_process').exec);
 function cloneLocalGit(git, sourceDir, destDir) {
     return __awaiter(this, void 0, void 0, function* () {
         const remoteUrl = yield getRemoteUrl(git);
@@ -65,12 +64,6 @@ function createAndPushEmptyBranch(git, destDir, branch) {
     });
 }
 exports.createAndPushEmptyBranch = createAndPushEmptyBranch;
-function runBuild(buildCmd, buildDir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield shellExec(`npm run ${buildCmd}`, { cwd: buildDir });
-    });
-}
-exports.runBuild = runBuild;
 function getGitSummary(gitDir) {
     return __awaiter(this, void 0, void 0, function* () {
         const git = new SimpleGit(gitDir);
@@ -117,16 +110,41 @@ function getManifestVersion(dir) {
     });
 }
 exports.getManifestVersion = getManifestVersion;
-function shellExec(cmd, options) {
+function shellSpawn(cmd, args, options, onDataLine) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { stdout, stderr, error } = yield exec(cmd, options);
-        if (error) {
-            throw new Error(error);
-        }
-        return { stderr: (stderr || '').trim(), stdout: (stdout || '').trim() };
+        return new Promise((resolve, reject) => {
+            const ls = child_process_1.spawn(cmd, args, options);
+            let error = '';
+            let result = '';
+            ls.stdout.on('data', (data) => {
+                result += data.toString();
+                const sl = result.split('\n');
+                if (sl.length > 1) {
+                    for (let i = 0; i < sl.length - 1; i++) {
+                        if (sl[i].length > 0)
+                            onDataLine(sl[i]);
+                    }
+                    result = sl[sl.length - 1];
+                }
+            });
+            ls.stderr.on('data', (data) => {
+                error += data.toString();
+            });
+            ls.on('close', (code) => {
+                if (result.length > 0) {
+                    onDataLine(result);
+                }
+                if (code !== 0) {
+                    reject(error);
+                }
+                else {
+                    resolve();
+                }
+            });
+        });
     });
 }
-exports.shellExec = shellExec;
+exports.shellSpawn = shellSpawn;
 function buildEnv(envExtra) {
     if (!envExtra) {
         return process.env;

@@ -1,5 +1,5 @@
 import {EmitType} from '..';
-import {getManifest, shellExec} from '../utils';
+import {getManifest, shellSpawn} from '../utils';
 import {Run} from './run-base';
 import fse from 'fs-extra';
 import path from 'path';
@@ -19,23 +19,12 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 		const manifest = await getManifest(soureDir, true);
 		await this.emit(EmitType.OPERATION, 'writing', `Writing ${'package.json'}`);
 		delete manifest.devDependencies;
-		// const pack: { [key: string]: any } = {};
-		//
-		// Object.keys(manifest).forEach(key => {
-		// 	if (['devDependencies'].indexOf(key) < 0) {
-		// 		pack[key] = manifest[key];
-		// 	}
-		// });
-		// pack.scripts = {};
-		// Object.keys(manifest.scripts).forEach(key => {
-		// 	if (['start'].indexOf(key) >= 0 || key.indexOf('cmd:') === 0) {
-		// 		pack.scripts[key] = manifest.scripts[key];
-		// 	}
-		// });
 		await fse.writeFile(path.resolve(destDir, 'package.json'), JSON.stringify(manifest, null, '\t'));
 		await this.emit(EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
-		const result = await shellExec(`npm install --production -s --no-color -no-audit`, {cwd: destDir});
-		await this.emit(EmitType.SUCCESS, 'generating', result.stdout || '');
+		await shellSpawn('npm', ['install', '--production', '--no-color', '-no-audit'], {cwd: destDir}, (s: string) => {
+			this.emit(EmitType.LOG, '', s);
+		});
+		await this.emit(EmitType.SUCCESS, 'generating', '');
 		await fse.remove(path.resolve(destDir, 'node_modules'));
 	}
 
@@ -49,6 +38,7 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 				for (const subentry of list) {
 					await fse.copy(path.resolve(opts.SOURCE_DIR, entry, subentry), path.resolve(opts.RELEASE_DIR, subentry));
 					copied.push(subentry);
+					await this.emit(EmitType.LOG, '', subentry);
 				}
 			}
 		}
@@ -58,6 +48,7 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 				await this.emit(EmitType.OPERATION, 'copying', `Copying component ${entry}`);
 				await fse.copy(path.resolve(opts.SOURCE_DIR, entry), path.resolve(opts.RELEASE_DIR, entry));
 				copied.push(entry);
+				await this.emit(EmitType.LOG, '', entry);
 			}
 		}
 
@@ -67,7 +58,7 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 			if (opts.GENERATE_SLIM_PACKAGE) {
 				await this.configureNPMJson(opts.SOURCE_DIR, opts.RELEASE_DIR);
 			}
-			await this.emit(EmitType.SUCCESS, 'generated', copied.join('\n'));
+			await this.emit(EmitType.SUCCESS, 'generated', '');
 		}
 
 	}

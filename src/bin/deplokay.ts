@@ -9,10 +9,6 @@ import {JekyllPublishAction} from '../lib/action/jekyll-git-publish';
 import {HugoPublishAction} from '../lib/action/hugo-git-publish';
 import {DEFAULT_HUGO_VERSION} from '../consts';
 
-const ora = require('ora');
-const spinner = ora('dots', {stream: process.stdout});
-const spinEnabled = process.stdout.isTTY;
-
 const manifest = require(path.resolve(__dirname, '../../package.json'));
 
 function parameterList(str: string, list: Array<string>): Array<string> {
@@ -28,6 +24,11 @@ export class DeplokayCLI {
 
 	protected async emit(task: { id: string }, type: EmitType, state: string, details: string): Promise<void> {
 		switch (type) {
+			case EmitType.LOG:
+				if (details.length > 0) {
+					console.log(' ', chalk.gray(details));
+				}
+				return;
 			case EmitType.DONE:
 				state = chalk.green(state);
 				break;
@@ -41,24 +42,13 @@ export class DeplokayCLI {
 				state = chalk.cyan(state);
 				break;
 			case EmitType.SUCCESS:
-				state = chalk.cyan(state);
+				state = chalk.greenBright(state);
 				details = chalk.gray(details);
 				break;
 		}
-		if (spinEnabled && spinner.isSpinning) {
-			if (type !== EmitType.ERROR) {
-				spinner.succeed();
-			} else {
-				spinner.fail();
-			}
-		}
 		const taskPrefix = task.id ? `[${task.id}] ` : '';
-		const line = `${taskPrefix}${state}${(type === EmitType.SUCCESS ? '\n' : ' ')}${details}`;
-		if (spinEnabled && type !== EmitType.ERROR && type !== EmitType.FINISH) {
-			spinner.start(line);
-		} else {
-			console.log(line);
-		}
+		const line = `${taskPrefix}${state}${(type === EmitType.SUCCESS && (details.length > 0) ? '\n' : ' ')}${details}`;
+		console.log(line);
 	}
 
 	protected programOptions(prog: program.CommanderStatic) {

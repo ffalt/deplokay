@@ -1,8 +1,6 @@
 import {EmitType} from '..';
-import {buildEnv, getManifest, shellExec, ShellExecOptions} from '../utils';
+import {buildEnv, shellSpawn} from '../utils';
 import {Run} from './run-base';
-import fse from 'fs-extra';
-import path from 'path';
 
 export interface BuildNPMOptions {
 	BUILD_SOURCE_DIR: string;
@@ -17,35 +15,34 @@ export class BuildNPMRun extends Run<BuildNPMOptions> {
 		return buildEnv(env);
 	}
 
-	private async build(opts: BuildNPMOptions): Promise<void> {
-		await this.emit(EmitType.OPERATION, 'building', `Building with NPM ${opts.BUILD_CMD} in ${opts.BUILD_SOURCE_DIR}`);
-		const exec_options: {
-			cwd: string;
-			env: { [name: string]: any };
-		} = {
-			cwd: opts.BUILD_SOURCE_DIR,
-			env: this.buildEnv(opts)
-		};
-		const result = await this.execute(`npm run --no-color ${opts.BUILD_CMD}`, exec_options);
-		await this.emit(EmitType.SUCCESS, 'build', result);
-	}
-
-	private async execute(cmd: string, exec_options: ShellExecOptions): Promise<string> {
-		const {stdout} = await shellExec(cmd, exec_options);
-		return (stdout || '');
-	}
-
 	private async install(opts: BuildNPMOptions): Promise<void> {
 		await this.emit(EmitType.OPERATION, 'installing', `Installing npm dependencies`);
-		const exec_options: {
+		const spawn_options: {
 			cwd: string;
 			env: { [name: string]: any };
 		} = {
 			cwd: opts.BUILD_SOURCE_DIR,
 			env: this.buildEnv(opts)
 		};
-		const result = await this.execute(`npm install -s --no-color -no-audit`, exec_options);
-		await this.emit(EmitType.SUCCESS, 'installed', result);
+		await shellSpawn('npm', ['install', '--no-color', '-no-audit'], spawn_options, (s: string) => {
+			this.emit(EmitType.LOG, '', s);
+		});
+		await this.emit(EmitType.SUCCESS, 'installed', '');
+	}
+
+	private async build(opts: BuildNPMOptions): Promise<void> {
+		await this.emit(EmitType.OPERATION, 'building', `Building with NPM ${opts.BUILD_CMD} in ${opts.BUILD_SOURCE_DIR}`);
+		const spawn_options: {
+			cwd: string;
+			env: { [name: string]: any };
+		} = {
+			cwd: opts.BUILD_SOURCE_DIR,
+			env: this.buildEnv(opts)
+		};
+		await shellSpawn('npm', ['run', '--no-color', opts.BUILD_CMD], spawn_options, (s: string) => {
+			this.emit(EmitType.LOG, '', s);
+		});
+		await this.emit(EmitType.SUCCESS, 'build', '');
 	}
 
 

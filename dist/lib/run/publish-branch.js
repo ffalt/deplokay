@@ -17,22 +17,6 @@ const utils_1 = require("../utils");
 const run_base_1 = require("./run-base");
 const SimpleGit = require('simple-git/promise');
 class PublishToBranchRun extends run_base_1.Run {
-    isUpdateNeeded(opts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const version = yield utils_1.getManifestVersion(opts.GIT_DIR);
-            if (version === null) {
-                return Promise.reject(`Version from package.json could not be read. Exiting...`);
-            }
-            const sourcegit = new SimpleGit(opts.GIT_DIR);
-            yield sourcegit.pull();
-            const tags = yield sourcegit.tags();
-            if (tags.all.indexOf('v' + version) >= 0) {
-                yield this.emit(__1.EmitType.DONE, 'done', `Version ${version} is already released.`);
-                return { needed: false, version };
-            }
-            return { needed: false, version };
-        });
-    }
     run(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const version = yield utils_1.getManifestVersion(opts.GIT_DIR);
@@ -40,6 +24,11 @@ class PublishToBranchRun extends run_base_1.Run {
                 return Promise.reject(`Version from package.json could not be read. Exiting...`);
             }
             const sourcegit = new SimpleGit(opts.GIT_DIR);
+            sourcegit.outputHandler((command, stdout, stderr) => {
+                stdout.on('data', (data) => {
+                    this.emit(__1.EmitType.LOG, '', data.toString());
+                });
+            });
             yield sourcegit.pull();
             const tags = yield sourcegit.tags();
             if (tags.all.indexOf(version) >= 0) {
@@ -53,6 +42,11 @@ class PublishToBranchRun extends run_base_1.Run {
             }
             yield this.emit(__1.EmitType.OPERATION, 'cloning', `Cloning to ${opts.RELEASE_DIR}`);
             const destgit = yield utils_1.cloneLocalGit(sourcegit, opts.GIT_DIR, opts.RELEASE_DIR);
+            destgit.outputHandler((command, stdout, stderr) => {
+                stdout.on('data', (data) => {
+                    this.emit(__1.EmitType.LOG, '', data.toString());
+                });
+            });
             const hasBranch = yield utils_1.hasRemoteBranch(destgit, opts.RELEASE_BRANCH);
             if (hasBranch) {
                 yield this.emit(__1.EmitType.OPERATION, 'checkout', `Checkout Release Branch ${opts.RELEASE_BRANCH}`);

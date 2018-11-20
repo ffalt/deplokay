@@ -6,9 +6,5 @@ export interface PublishToBranchRunOptions {
     RELEASE_BRANCH: string;
 }
 export declare class PublishToBranchRun extends Run<PublishToBranchRunOptions> {
-    isUpdateNeeded(opts: PublishToBranchRunOptions): Promise<{
-        needed: boolean;
-        version: string;
-    }>;
     run(opts: PublishToBranchRunOptions): Promise<void>;
 }
