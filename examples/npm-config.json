@@ -18,12 +18,6 @@
   "publish": {
     "folder": {
       "path": "./data/npm-test/site"
-    },
-    "archive": {
-      "path": "./data/npm-test/archives"
-    },
-    "branch": {
-      "branch": "releases"
     }
   }
 }

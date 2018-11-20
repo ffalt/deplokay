@@ -2,8 +2,8 @@
   "id": "jekyll-test/master",
   "source": {
     "remote": {
-      "branch": "gh-pages",
-      "repository": "https://github.com/daigofuji/jekyll-foundation-6-starter.git",
+      "branch": "master",
+      "repository": "https://github.com/jekyll/minima.git",
       "checkout_path": "./data/jekyll-test/build"
     }
   },
