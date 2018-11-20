@@ -25,7 +25,9 @@ export class DeplokayCLI {
 	protected async emit(task: { id: string }, type: EmitType, state: string, details: string): Promise<void> {
 		switch (type) {
 			case EmitType.LOG:
-				console.log(' ', chalk.gray(details));
+				if (details.length > 0) {
+					console.log(' ', chalk.gray(details));
+				}
 				return;
 			case EmitType.DONE:
 				state = chalk.green(state);

@@ -14,27 +14,18 @@ export interface PublishToBranchRunOptions {
 
 export class PublishToBranchRun extends Run<PublishToBranchRunOptions> {
 
-	async isUpdateNeeded(opts: PublishToBranchRunOptions): Promise<{ needed: boolean, version: string }> {
-		const version = await getManifestVersion(opts.GIT_DIR);
-		if (version === null) {
-			return Promise.reject(`Version from package.json could not be read. Exiting...`);
-		}
-		const sourcegit = new SimpleGit(opts.GIT_DIR);
-		await sourcegit.pull();
-		const tags = await sourcegit.tags();
-		if (tags.all.indexOf('v' + version) >= 0) {
-			await this.emit(EmitType.DONE, 'done', `Version ${version} is already released.`);
-			return {needed: false, version};
-		}
-		return {needed: false, version};
-	}
-
 	async run(opts: PublishToBranchRunOptions): Promise<void> {
 		const version = await getManifestVersion(opts.GIT_DIR);
 		if (version === null) {
 			return Promise.reject(`Version from package.json could not be read. Exiting...`);
 		}
 		const sourcegit = new SimpleGit(opts.GIT_DIR);
+		sourcegit.outputHandler((command: string, stdout: any, stderr: any) => {
+			stdout.on('data', (data: Buffer) => {
+				this.emit(EmitType.LOG, '', data.toString());
+			});
+			// stderr.pipe(process.stderr);
+		});
 		await sourcegit.pull();
 		const tags = await sourcegit.tags();
 		if (tags.all.indexOf(version) >= 0) {
@@ -48,6 +39,12 @@ export class PublishToBranchRun extends Run<PublishToBranchRunOptions> {
 		}
 		await this.emit(EmitType.OPERATION, 'cloning', `Cloning to ${opts.RELEASE_DIR}`);
 		const destgit = await cloneLocalGit(sourcegit, opts.GIT_DIR, opts.RELEASE_DIR);
+		destgit.outputHandler((command: string, stdout: any, stderr: any) => {
+			stdout.on('data', (data: Buffer) => {
+				this.emit(EmitType.LOG, '', data.toString());
+			});
+			// stderr.pipe(process.stderr);
+		});
 		const hasBranch = await hasRemoteBranch(destgit, opts.RELEASE_BRANCH);
 		if (hasBranch) {
 			await this.emit(EmitType.OPERATION, 'checkout', `Checkout Release Branch ${opts.RELEASE_BRANCH}`);
