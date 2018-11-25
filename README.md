@@ -25,15 +25,15 @@ if you want to build with [jekyll](https://jekyllrb.com/):
 
 ### As standalone CLI
 
-npm install https://github.com/ffalt/deplokay.git#releases --g
+npm install github:ffalt/deplokay#releases --g
 
 ### As development dependency CLI
 
-npm install https://github.com/ffalt/deplokay.git#releases --save-dev
+npm install github:ffalt/deplokay#releases --save-dev
 
 ### As library
 
-npm install https://github.com/ffalt/deplokay.git#releases
+npm install github:ffalt/deplokay#releases
 
 ## Usage
 
