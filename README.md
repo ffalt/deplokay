@@ -57,8 +57,8 @@ Options:
   --npm_release_folder [name]     [build.npm] a folder name to copy its content to the release folder, e.g. "dist"  (multiple --nf allowed) (default: [])
   --npm_cmd_name [name]           [build.npm] npm build script name e.g. "build:deploy"
   --npm_slim_package [boolean]    [build.npm] strip development dependencies from package.json and generate a slim package-lock.json (default: false)
-  --hugo_version [name]           [build.hugo] hugo version to download (default: "0.51")
-  --hugo_extended [boolean]       [build] npm build script name e.g. "build:prod" (default: false)
+  --hugo_version [version]        [build.hugo] hugo version to download (default: "0.51")
+  --hugo_extended [boolean]       [build.hugo] npm build script name e.g. "build:prod" (default: false)
   --archive_path [path]           [publish.archive] destination directory for compressed archive files to publish
   --archive_name [name]           [publish.archive] base name for the archive file e.g. "project-pack"
   --publish_path [path]           [publish.folder] destination directory to publish
