@@ -1,5 +1,6 @@
 import { EmitFunction } from '..';
 export interface PublishActionOptions {
+    $schema?: string;
     id?: string;
     source: {
         local?: {
@@ -14,8 +15,8 @@ export interface PublishActionOptions {
     build: {
         npm?: {
             cmd_name: string;
-            component_names: Array<string>;
-            folder_names: Array<string>;
+            component_names?: Array<string>;
+            folder_names?: Array<string>;
             slim_package?: boolean;
         };
         hugo?: {
@@ -23,6 +24,7 @@ export interface PublishActionOptions {
             extended?: boolean;
         };
         jekyll?: {};
+        copy?: {};
     };
     publish: {
         branch?: {

@@ -20,10 +20,10 @@ class CombineReleaseRun extends run_base_1.Run {
     configureNPMJson(soureDir, destDir) {
         return __awaiter(this, void 0, void 0, function* () {
             const manifest = yield utils_1.getManifest(soureDir, true);
-            yield this.emit(__1.EmitType.OPERATION, 'writing', `Writing ${'package.json'}`);
+            yield this.emit(__1.EmitType.OPERATION, 'writing', `Writing package.json`);
             delete manifest.devDependencies;
             yield fs_extra_1.default.writeFile(path_1.default.resolve(destDir, 'package.json'), JSON.stringify(manifest, null, '\t'));
-            yield this.emit(__1.EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
+            yield this.emit(__1.EmitType.OPERATION, 'generating', `Generating package-lock.json`);
             yield utils_1.shellSpawn('npm', ['install', '--production', '--no-color', '-no-audit'], { cwd: destDir }, (s) => {
                 this.emit(__1.EmitType.LOG, '', s);
             });

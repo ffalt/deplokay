@@ -99,35 +99,43 @@ export async function getManifestVersion(dir: string): Promise<string> {
 export async function shellSpawn(cmd: string, args: Array<string>, options: SpawnOptions, onDataLine: (s: string) => void): Promise<void> {
 	return new Promise<void>((resolve, reject) => {
 
-		const ls = spawn(cmd, args, options);
-		let error = '';
-		let result = '';
-		ls.stdout.on('data', (data) => {
-			result += data.toString();
-			const sl = result.split('\n');
-			if (sl.length > 1) {
-				for (let i = 0; i < sl.length - 1; i++) {
-					if (sl[i].length > 0)
-						onDataLine(sl[i]);
+		try {
+			const ls = spawn(cmd, args, options);
+			let error = '';
+			let result = '';
+			ls.stdout.on('data', (data) => {
+				result += data.toString();
+				const sl = result.split('\n');
+				if (sl.length > 1) {
+					for (let i = 0; i < sl.length - 1; i++) {
+						if (sl[i].length > 0) {
+							onDataLine(sl[i]);
+						}
+					}
+					result = sl[sl.length - 1];
 				}
-				result = sl[sl.length - 1];
-			}
-		});
+			});
 
-		ls.stderr.on('data', (data) => {
-			error += data.toString();
-		});
+			ls.stderr.on('data', (data) => {
+				error += data.toString();
+			});
 
-		ls.on('close', (code) => {
-			if (result.length > 0) {
-				onDataLine(result);
-			}
-			if (code !== 0) {
-				reject(error);
-			} else {
-				resolve();
-			}
-		});
+			ls.on('close', (code) => {
+				if (result.length > 0) {
+					onDataLine(result);
+				}
+				if (code !== 0) {
+					reject(error);
+				} else {
+					resolve();
+				}
+			});
+			ls.on('error', (e) => {
+				reject(e);
+			});
+		} catch (e) {
+			reject(e);
+		}
 	});
 }
 

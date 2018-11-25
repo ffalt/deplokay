@@ -1,6 +1,6 @@
 {
 	"name": "deplokay",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "deplokay is a deployment helper (CLI/Library) for node. Build a git repository with jekyll, hugo or npm & deploy to a folder, archive or branch",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -10,7 +10,12 @@
 		"clean": "rimraf ./dist",
 		"lint": "tslint --project tsconfig.json \"src/**/*.ts\"",
 		"build:deploy": "npm run clean && npm run build",
-		"deploy": "node bin/deplokay.js -c examples/deplokay.json"
+		"build:config-schema": "typescript-json-schema \"tsconfig.json\" \"PublishActionOptions\" --required -o config-schema.json",
+		"deploy": "node bin/deplokay.js -c examples/deplokay.json",
+		"example:copy": "node bin/deplokay.js -c examples/copy-config.json",
+		"example:hugo": "node bin/deplokay.js -c examples/hugo-config.json",
+		"example:jekyll": "node bin/deplokay.js -c examples/jekyll-config.json",
+		"example:npm": "node bin/deplokay.js -c examples/npm-config.json"
 	},
 	"repository": {
 		"type": "git",

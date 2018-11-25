@@ -20,6 +20,7 @@ const npm_git_publish_1 = require("../lib/action/npm-git-publish");
 const jekyll_git_publish_1 = require("../lib/action/jekyll-git-publish");
 const hugo_git_publish_1 = require("../lib/action/hugo-git-publish");
 const consts_1 = require("../consts");
+const copy_git_publish_1 = require("../lib/action/copy-git-publish");
 const manifest = require(path_1.default.resolve(__dirname, '../../package.json'));
 function parameterList(str, list) {
     list.push(str);
@@ -62,7 +63,7 @@ class DeplokayCLI {
     programOptions(prog) {
         prog
             .option('--id [id]', 'id for the task')
-            .option('--mode <mode>', 'kind of project to publish (npm|jekyll|hugo)')
+            .option('--mode <mode>', 'kind of project to publish (npm|jekyll|hugo|copy)')
             .option('--local [path]', '[source.local] local git repository path')
             .option('--repository [url]', '[source.remote] git repository url')
             .option('--branch [name]', '[source.remote] branch to publish e.g. "master"')
@@ -110,6 +111,9 @@ class DeplokayCLI {
             case 'jekyll':
                 result.build.jekyll = {};
                 break;
+            case 'copy':
+                result.build.copy = {};
+                break;
             case 'hugo':
                 result.build.hugo = {
                     version: prog.hugo_version,
@@ -146,6 +150,9 @@ class DeplokayCLI {
             }
             else if (opts.build.hugo) {
                 action = new hugo_git_publish_1.HugoPublishAction(opts, { id: opts.id }, this.emit);
+            }
+            else if (opts.build.copy) {
+                action = new copy_git_publish_1.CopyPublishAction(opts, { id: opts.id }, this.emit);
             }
             else {
                 return Promise.reject('Invalid Build Mode');

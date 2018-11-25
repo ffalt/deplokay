@@ -113,34 +113,43 @@ exports.getManifestVersion = getManifestVersion;
 function shellSpawn(cmd, args, options, onDataLine) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
-            const ls = child_process_1.spawn(cmd, args, options);
-            let error = '';
-            let result = '';
-            ls.stdout.on('data', (data) => {
-                result += data.toString();
-                const sl = result.split('\n');
-                if (sl.length > 1) {
-                    for (let i = 0; i < sl.length - 1; i++) {
-                        if (sl[i].length > 0)
-                            onDataLine(sl[i]);
+            try {
+                const ls = child_process_1.spawn(cmd, args, options);
+                let error = '';
+                let result = '';
+                ls.stdout.on('data', (data) => {
+                    result += data.toString();
+                    const sl = result.split('\n');
+                    if (sl.length > 1) {
+                        for (let i = 0; i < sl.length - 1; i++) {
+                            if (sl[i].length > 0) {
+                                onDataLine(sl[i]);
+                            }
+                        }
+                        result = sl[sl.length - 1];
                     }
-                    result = sl[sl.length - 1];
-                }
-            });
-            ls.stderr.on('data', (data) => {
-                error += data.toString();
-            });
-            ls.on('close', (code) => {
-                if (result.length > 0) {
-                    onDataLine(result);
-                }
-                if (code !== 0) {
-                    reject(error);
-                }
-                else {
-                    resolve();
-                }
-            });
+                });
+                ls.stderr.on('data', (data) => {
+                    error += data.toString();
+                });
+                ls.on('close', (code) => {
+                    if (result.length > 0) {
+                        onDataLine(result);
+                    }
+                    if (code !== 0) {
+                        reject(error);
+                    }
+                    else {
+                        resolve();
+                    }
+                });
+                ls.on('error', (e) => {
+                    reject(e);
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
         });
     });
 }

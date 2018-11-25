@@ -73,8 +73,8 @@ class PublishActionBase {
             if (!this.opts.build) {
                 return Promise.reject('Missing Option "build": Please provide a build option node');
             }
-            if (!this.opts.build.npm && !this.opts.build.jekyll && !this.opts.build.hugo) {
-                return Promise.reject('Invalid Option "build.(jekyll|npm|hugo)": Please provide at least one build mode option');
+            if (!this.opts.build.npm && !this.opts.build.jekyll && !this.opts.build.hugo && !this.opts.build.copy) {
+                return Promise.reject('Invalid Option "build.(jekyll|npm|hugo|copy)": Please provide at least one build mode option');
             }
             if (Object.keys(this.opts.build).length !== 1) {
                 return Promise.reject('Invalid Option "build.(mode)": Please provide only one build mode option');
