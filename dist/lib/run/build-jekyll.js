@@ -86,7 +86,7 @@ gem 'github-pages'`;
                 env: utils_1.buildEnv(opts.BUILD_ENV)
             };
             let result = '';
-            yield utils_1.shellSpawn('babababundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s) => {
+            yield utils_1.shellSpawn('bundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s) => {
                 result += s + '\n';
                 this.emit(__1.EmitType.LOG, '', s);
             });
