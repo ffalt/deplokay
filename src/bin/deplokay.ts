@@ -68,8 +68,8 @@ export class DeplokayCLI {
 			.option('--npm_cmd_name [name]', '[build.npm] npm build script name e.g. "build:deploy"')
 			.option('--npm_slim_package [boolean]', '[build.npm] strip development dependencies from package.json and generate a slim package-lock.json', parameterBool, false)
 
-			.option('--hugo_version [name]', '[build.hugo] hugo version to download', DEFAULT_HUGO_VERSION)
-			.option('--hugo_extended [boolean]', '[build] npm build script name e.g. "build:prod"', parameterBool, false)
+			.option('--hugo_version [version]', '[build.hugo] hugo version to download', DEFAULT_HUGO_VERSION)
+			.option('--hugo_extended [boolean]', '[build.hugo] npm build script name e.g. "build:prod"', parameterBool, false)
 
 			.option('--archive_path [path]', '[publish.archive] destination directory for compressed archive files to publish')
 			.option('--archive_name [name]', '[publish.archive] base name for the archive file e.g. "project-pack"')

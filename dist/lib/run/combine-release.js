@@ -47,7 +47,6 @@ class CombineReleaseRun extends run_base_1.Run {
             }
             if (opts.COMPONENTS && opts.COMPONENTS.length > 0) {
                 for (const entry of opts.COMPONENTS) {
-                    yield this.emit(__1.EmitType.OPERATION, 'copying', `Copying component ${entry}`);
                     yield fs_extra_1.default.copy(path_1.default.resolve(opts.SOURCE_DIR, entry), path_1.default.resolve(opts.RELEASE_DIR, entry));
                     copied.push(entry);
                     yield this.emit(__1.EmitType.LOG, '', entry);

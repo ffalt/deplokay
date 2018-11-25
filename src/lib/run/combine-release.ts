@@ -45,7 +45,6 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 
 		if (opts.COMPONENTS && opts.COMPONENTS.length > 0) {
 			for (const entry of opts.COMPONENTS) {
-				await this.emit(EmitType.OPERATION, 'copying', `Copying component ${entry}`);
 				await fse.copy(path.resolve(opts.SOURCE_DIR, entry), path.resolve(opts.RELEASE_DIR, entry));
 				copied.push(entry);
 				await this.emit(EmitType.LOG, '', entry);
