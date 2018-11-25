@@ -1,4 +1,5 @@
 {
+  "$schema": "../config-schema.json",
   "id": "deplokay/master",
   "mode": "npm",
   "source": {

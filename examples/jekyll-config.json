@@ -1,4 +1,5 @@
 {
+  "$schema": "../config-schema.json",
   "id": "jekyll-test/master",
   "source": {
     "remote": {

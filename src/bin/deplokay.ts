@@ -8,6 +8,7 @@ import {NPMPublishAction} from '../lib/action/npm-git-publish';
 import {JekyllPublishAction} from '../lib/action/jekyll-git-publish';
 import {HugoPublishAction} from '../lib/action/hugo-git-publish';
 import {DEFAULT_HUGO_VERSION} from '../consts';
+import {CopyPublishAction} from '../lib/action/copy-git-publish';
 
 const manifest = require(path.resolve(__dirname, '../../package.json'));
 
@@ -55,7 +56,7 @@ export class DeplokayCLI {
 		prog
 			.option('--id [id]', 'id for the task')
 
-			.option('--mode <mode>', 'kind of project to publish (npm|jekyll|hugo)')
+			.option('--mode <mode>', 'kind of project to publish (npm|jekyll|hugo|copy)')
 
 			.option('--local [path]', '[source.local] local git repository path')
 
@@ -110,6 +111,9 @@ export class DeplokayCLI {
 			case 'jekyll':
 				result.build.jekyll = {};
 				break;
+			case 'copy':
+				result.build.copy = {};
+				break;
 			case 'hugo':
 				result.build.hugo = {
 					version: prog.hugo_version,
@@ -144,6 +148,8 @@ export class DeplokayCLI {
 			action = new JekyllPublishAction(opts, {id: opts.id}, this.emit);
 		} else if (opts.build.hugo) {
 			action = new HugoPublishAction(opts, {id: opts.id}, this.emit);
+		} else if (opts.build.copy) {
+			action = new CopyPublishAction(opts, {id: opts.id}, this.emit);
 		} else {
 			return Promise.reject('Invalid Build Mode');
 		}

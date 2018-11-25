@@ -17,10 +17,10 @@ export class CombineReleaseRun extends Run<CombineReleaseOptions> {
 
 	private async configureNPMJson(soureDir: string, destDir: string): Promise<void> {
 		const manifest = await getManifest(soureDir, true);
-		await this.emit(EmitType.OPERATION, 'writing', `Writing ${'package.json'}`);
+		await this.emit(EmitType.OPERATION, 'writing', `Writing package.json`);
 		delete manifest.devDependencies;
 		await fse.writeFile(path.resolve(destDir, 'package.json'), JSON.stringify(manifest, null, '\t'));
-		await this.emit(EmitType.OPERATION, 'generating', `Generating ${'package-lock.json'}`);
+		await this.emit(EmitType.OPERATION, 'generating', `Generating package-lock.json`);
 		await shellSpawn('npm', ['install', '--production', '--no-color', '-no-audit'], {cwd: destDir}, (s: string) => {
 			this.emit(EmitType.LOG, '', s);
 		});

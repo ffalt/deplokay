@@ -6,45 +6,140 @@ import {PublishToArchiveRun, PublishToArchiveRunOptions} from '../run/publish-ar
 import {GitFolderRun, GitFolderOptions} from '../run/git-folder';
 import {getGitSummary} from '../utils';
 
+/**
+ * Deplokay Config Format
+ */
 export interface PublishActionOptions {
-	id?: string; // identifier (for logging & progress callbacks, not used internally)
+	/**
+	 * The schema file for the config.json e.g. "config-schema.json"
+	 */
+	$schema?: string;
+	/**
+	 * identifier (for logging & progress callbacks, not used internally)
+	 */
+	id?: string;
+	/**
+	 * source git settings
+	 */
 	source: {
+		/**
+		 * local git source
+		 */
 		local?: {
-			path: string; // a local git project folder to publish e.g. "/Users/you/projects/awesome/"
+			/**
+			 * a local git project folder to publish e.g. "/Users/you/projects/awesome/"
+			 */
+			path: string;
 		};
+		/**
+		 * remote git source
+		 */
 		remote?: {
-			branch: string; // branch of the remote git e.g. "master"
-			checkout_path: string; // "./temp/awesome-project-deploy/"
-			repository: string; // a remote git project url e.g. 'https://github.com/ffalt/deplokay.git"
+			/**
+			 *  branch of the remote git e.g. "master"
+			 */
+			branch: string;
+			/**
+			 * the local path where to checkout the remote git e.g. "./temp/awesome-project-deploy/"
+			 */
+			checkout_path: string;
+			/**
+			 * a remote git project url e.g. 'https://github.com/ffalt/deplokay.git"
+			 */
+			repository: string;
 		};
 	};
+	/**
+	 * build settings
+	 */
 	build: {
+		/**
+		 * build with npm
+		 */
 		npm?: {
-			cmd_name: string; // a npm build script name e.g. "build:production"
-			component_names: Array<string>; // a list of files|folders names to copy to the release folder, e.g. ["dist","package.json"]]
-			folder_names: Array<string>; // a list of folders names to copy their content to the release folder, e.g. "dist"
-			slim_package?: boolean; // default false, strip development dependencies from package.json and generate a slim package-lock.json
+			/**
+			 * a npm build script name e.g. "build:production"
+			 */
+			cmd_name: string;
+			/**
+			 * a list of files|folders names to copy to the release folder, e.g. ["dist","package.json"]]
+			 */
+			component_names?: Array<string>;
+			/**
+			 * a list of folders names to copy their content to the release folder, e.g. "dist"
+			 */
+			folder_names?: Array<string>;
+			/**
+			 * strip development dependencies from package.json and generate a slim package-lock.json, default false
+			 */
+			slim_package?: boolean;
 		},
+		/**
+		 * build with hugo
+		 */
 		hugo?: {
-			version?: string, // hugo version to download
-			extended?: boolean, // hugo extended version to download, default 'false'
+			/**
+			 * hugo version to download
+			 */
+			version?: string;
+			/**
+			 * hugo extended version to download, default 'false'
+			 */
+			extended?: boolean;
 		},
-		jekyll?: {}
+		/**
+		 * build with jekyll
+		 */
+		jekyll?: {};
+		/**
+		 * just copy the full source folder
+		 */
+		copy?: {};
 	};
+	/**
+	 * publish settings
+	 */
 	publish: {
+		/**
+		 * publish to branch
+		 */
 		branch?: {
-			branch: string; // the branch where to post the release e.g. "releases"
-		}
+			/**
+			 *  the branch where to post the release e.g. "releases"
+			 */
+			branch: string;
+		};
+		/**
+		 * publish to folder
+		 */
 		folder?: {
-			path: string; // a folder where the release is copied e.g. "/var/www/awesome-site/"
-		}
+			/**
+			 * a folder where the release is copied e.g. "/var/www/awesome-site/"
+			 */
+			path: string;
+		};
+		/**
+		 * publish as archive file
+		 */
 		archive?: {
-			name?: string; // a base name for the archive file e.g. "awesome-pack"
-			path: string; // a folder where the archive file is written e.g. "./releases/zip/"
-		}
+			/**
+			 * a base name for the archive file e.g. "awesome-pack"
+			 */
+			name?: string;
+			/**
+			 * a folder where the archive file is written e.g. "./releases/zip/"
+			 */
+			path: string;
+		};
 	};
+	/**
+	 * environment variables passed to external tools
+	 */
 	env?: {
-		[name: string]: string; // environment variables passed to jekyl, hugo and npm e.g.  "JEKYLL_ENV": "production"
+		/**
+		 * environment variables passed to jekyl, hugo and npm e.g.  "JEKYLL_ENV": "production"
+		 */
+		[name: string]: string;
 	};
 }
 
@@ -104,8 +199,8 @@ export abstract class PublishActionBase<T extends PublishActionOptions> {
 			return Promise.reject('Missing Option "build": Please provide a build option node');
 		}
 
-		if (!this.opts.build.npm && !this.opts.build.jekyll && !this.opts.build.hugo) {
-			return Promise.reject('Invalid Option "build.(jekyll|npm|hugo)": Please provide at least one build mode option');
+		if (!this.opts.build.npm && !this.opts.build.jekyll && !this.opts.build.hugo && !this.opts.build.copy) {
+			return Promise.reject('Invalid Option "build.(jekyll|npm|hugo|copy)": Please provide at least one build mode option');
 		}
 
 		if (Object.keys(this.opts.build).length !== 1) {

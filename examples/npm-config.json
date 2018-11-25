@@ -1,4 +1,5 @@
 {
+  "$schema": "../config-schema.json",
   "id": "npm-test/master",
   "source": {
     "remote": {

@@ -1,0 +1,24 @@
+{
+  "$schema": "../config-schema.json",
+  "id": "copy-test/master",
+  "mode": "copy",
+  "source": {
+    "remote": {
+      "branch": "master",
+      "repository": "https://github.com/ffalt/ffalt.github.io.git",
+      "checkout_path": "./data/copy-test/build"
+    }
+  },
+  "build": {
+    "copy": {}
+  },
+  "publish": {
+    "folder": {
+      "path": "./data/copy-test/site"
+    },
+    "archive": {
+      "name": "ffalt.github.io",
+      "path": "./data/copy-test/archives"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 {
+  "$schema": "../config-schema.json",
   "id": "hugo-test/master",
   "mode": "hugo",
   "source": {
