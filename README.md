@@ -76,8 +76,8 @@ you can use it e.g. within a 'package.json'
 
 ```
  "scripts": {
-    "deploy:archive": "deplokay -c ./deploykay-archive-config.json",
-    "deploy:branch": "deplokay -c ./deploykay-branch-config.json"
+    "deploy:archive": "deplokay -c ./deplokay-archive-config.json",
+    "deploy:branch": "deplokay -c ./deplokay-branch-config.json"
   },
 ```
 
