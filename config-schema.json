@@ -1,0 +1,182 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Deplokay Config Format",
+    "properties": {
+        "$schema": {
+            "description": "The schema file for the config.json e.g. \"config-schema.json\"",
+            "type": "string"
+        },
+        "build": {
+            "description": "build settings",
+            "properties": {
+                "copy": {
+                    "description": "just copy the full source folder",
+                    "properties": {
+                    },
+                    "type": "object"
+                },
+                "hugo": {
+                    "description": "build with hugo",
+                    "properties": {
+                        "extended": {
+                            "description": "hugo extended version to download, default 'false'",
+                            "type": "boolean"
+                        },
+                        "version": {
+                            "description": "hugo version to download",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "jekyll": {
+                    "description": "build with jekyll",
+                    "properties": {
+                    },
+                    "type": "object"
+                },
+                "npm": {
+                    "description": "build with npm",
+                    "properties": {
+                        "cmd_name": {
+                            "description": "a npm build script name e.g. \"build:production\"",
+                            "type": "string"
+                        },
+                        "component_names": {
+                            "description": "a list of files|folders names to copy to the release folder, e.g. [\"dist\",\"package.json\"]]",
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "folder_names": {
+                            "description": "a list of folders names to copy their content to the release folder, e.g. \"dist\"",
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "slim_package": {
+                            "description": "strip development dependencies from package.json and generate a slim package-lock.json, default false",
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "cmd_name"
+                    ],
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "env": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "environment variables passed to external tools",
+            "type": "object"
+        },
+        "id": {
+            "description": "identifier (for logging & progress callbacks, not used internally)",
+            "type": "string"
+        },
+        "publish": {
+            "description": "publish settings",
+            "properties": {
+                "archive": {
+                    "description": "publish as archive file",
+                    "properties": {
+                        "name": {
+                            "description": "a base name for the archive file e.g. \"awesome-pack\"",
+                            "type": "string"
+                        },
+                        "path": {
+                            "description": "a folder where the archive file is written e.g. \"./releases/zip/\"",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "type": "object"
+                },
+                "branch": {
+                    "description": "publish to branch",
+                    "properties": {
+                        "branch": {
+                            "description": "the branch where to post the release e.g. \"releases\"",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "branch"
+                    ],
+                    "type": "object"
+                },
+                "folder": {
+                    "description": "publish to folder",
+                    "properties": {
+                        "path": {
+                            "description": "a folder where the release is copied e.g. \"/var/www/awesome-site/\"",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "source": {
+            "description": "source git settings",
+            "properties": {
+                "local": {
+                    "description": "local git source",
+                    "properties": {
+                        "path": {
+                            "description": "a local git project folder to publish e.g. \"/Users/you/projects/awesome/\"",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "type": "object"
+                },
+                "remote": {
+                    "description": "remote git source",
+                    "properties": {
+                        "branch": {
+                            "description": "branch of the remote git e.g. \"master\"",
+                            "type": "string"
+                        },
+                        "checkout_path": {
+                            "description": "the local path where to checkout the remote git e.g. \"./temp/awesome-project-deploy/\"",
+                            "type": "string"
+                        },
+                        "repository": {
+                            "description": "a remote git project url e.g. 'https://github.com/ffalt/deplokay.git\"",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "branch",
+                        "checkout_path",
+                        "repository"
+                    ],
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "build",
+        "publish",
+        "source"
+    ],
+    "type": "object"
+}
+
