@@ -25,15 +25,15 @@ if you want to build with [jekyll](https://jekyllrb.com/):
 
 ### As standalone CLI
 
-npm install github:ffalt/deplokay#releases --g
+npm install deplokay --g
 
 ### As development dependency CLI
 
-npm install github:ffalt/deplokay#releases --save-dev
+npm install deplokay --save-dev
 
 ### As library
 
-npm install github:ffalt/deplokay#releases
+npm install deplokay
 
 ## Usage
 
@@ -76,8 +76,8 @@ you can use it e.g. within a 'package.json'
 
 ```
  "scripts": {
-    "deploy:archive": "deplokay -c ./deploykay-archive-config.json",
-    "deploy:branch": "deplokay -c ./deploykay-branch-config.json"
+    "deploy:archive": "deplokay -c ./deplokay-archive-config.json",
+    "deploy:branch": "deplokay -c ./deplokay-branch-config.json"
   },
 ```
 

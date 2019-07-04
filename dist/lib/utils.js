@@ -117,6 +117,9 @@ function shellSpawn(cmd, args, options, onDataLine) {
                 const ls = child_process_1.spawn(cmd, args, options);
                 let error = '';
                 let result = '';
+                if (!ls.stdout || !ls.stderr) {
+                    throw Error('Spawning shell not supported in this environment');
+                }
                 ls.stdout.on('data', (data) => {
                     result += data.toString();
                     const sl = result.split('\n');
