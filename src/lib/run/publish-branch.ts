@@ -7,6 +7,7 @@ const SimpleGit = require('simple-git/promise');
 
 export interface PublishToBranchRunOptions {
 	GIT_DIR: string;
+	DISABLE_TAG: boolean;
 	SOURCE_DIR: string;
 	RELEASE_DIR: string;
 	RELEASE_BRANCH: string;
@@ -59,10 +60,12 @@ export class PublishToBranchRun extends Run<PublishToBranchRunOptions> {
 		await this.emit(EmitType.OPERATION, 'commiting', `Commit Version ${version}`);
 		await destgit.add('.');
 		await destgit.commit(version);
-		await this.emit(EmitType.OPERATION, 'tagging', `Tag Version ${version}`);
-		await destgit.tag([`v${version}`]);
-		await destgit.push('origin', opts.RELEASE_BRANCH);
-		await destgit.push('origin', '--tags');
+		if (!opts.DISABLE_TAG) {
+			await this.emit(EmitType.OPERATION, 'tagging', `Tag Version ${version}`);
+			await destgit.tag([`v${version}`]);
+			await destgit.push('origin', opts.RELEASE_BRANCH);
+			await destgit.push('origin', '--tags');
+		}
 		await this.emit(EmitType.OPERATION, 'cleaning', `Cleaning up ${opts.RELEASE_DIR}`);
 		await fse.remove(opts.RELEASE_DIR);
 	}

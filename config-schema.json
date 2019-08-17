@@ -106,6 +106,10 @@
                         "branch": {
                             "description": "the branch where to post the release e.g. \"releases\"",
                             "type": "string"
+                        },
+                        "disableTag": {
+                            "description": "disable creating a git tag",
+                            "type": "boolean"
                         }
                     },
                     "required": [

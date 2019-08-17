@@ -108,6 +108,10 @@ export interface PublishActionOptions {
 			 *  the branch where to post the release e.g. "releases"
 			 */
 			branch: string;
+			/**
+			 *  disable creating a git tag
+			 */
+			disableTag?: boolean;
 		};
 		/**
 		 * publish to folder
@@ -247,6 +251,7 @@ export abstract class PublishActionBase<T extends PublishActionOptions> {
 			const gitBranchOptions: PublishToBranchRunOptions = {
 				GIT_DIR: build_path,
 				SOURCE_DIR: dist_path,
+				DISABLE_TAG: !!this.opts.publish.branch.disableTag,
 				RELEASE_DIR: path.resolve(build_path, '.releases'),
 				RELEASE_BRANCH: this.opts.publish.branch.branch
 			};
