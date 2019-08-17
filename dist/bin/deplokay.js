@@ -78,6 +78,7 @@ class DeplokayCLI {
             .option('--archive_name [name]', '[publish.archive] base name for the archive file e.g. "project-pack"')
             .option('--publish_path [path]', '[publish.folder] destination directory to publish')
             .option('--target_branch [name]', '[publish.branch] destination branch to publish')
+            .option('--target_branch_tag [boolean]', '[build.branch] create a release git tag', parameterBool, true)
             .option('-d, --disable_colors', 'no colored output');
     }
     cliOptions(prog) {
@@ -134,7 +135,8 @@ class DeplokayCLI {
         }
         if (prog.target_branch) {
             result.publish.branch = {
-                branch: prog.target_branch
+                branch: prog.target_branch,
+                disableTag: !prog.target_branch_tag
             };
         }
         return result;

@@ -62,10 +62,12 @@ class PublishToBranchRun extends run_base_1.Run {
             yield this.emit(__1.EmitType.OPERATION, 'commiting', `Commit Version ${version}`);
             yield destgit.add('.');
             yield destgit.commit(version);
-            yield this.emit(__1.EmitType.OPERATION, 'tagging', `Tag Version ${version}`);
-            yield destgit.tag([`v${version}`]);
-            yield destgit.push('origin', opts.RELEASE_BRANCH);
-            yield destgit.push('origin', '--tags');
+            if (!opts.DISABLE_TAG) {
+                yield this.emit(__1.EmitType.OPERATION, 'tagging', `Tag Version ${version}`);
+                yield destgit.tag([`v${version}`]);
+                yield destgit.push('origin', opts.RELEASE_BRANCH);
+                yield destgit.push('origin', '--tags');
+            }
             yield this.emit(__1.EmitType.OPERATION, 'cleaning', `Cleaning up ${opts.RELEASE_DIR}`);
             yield fs_extra_1.default.remove(opts.RELEASE_DIR);
         });

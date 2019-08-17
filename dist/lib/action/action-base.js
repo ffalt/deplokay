@@ -121,6 +121,7 @@ class PublishActionBase {
                 const gitBranchOptions = {
                     GIT_DIR: build_path,
                     SOURCE_DIR: dist_path,
+                    DISABLE_TAG: !!this.opts.publish.branch.disableTag,
                     RELEASE_DIR: path_1.default.resolve(build_path, '.releases'),
                     RELEASE_BRANCH: this.opts.publish.branch.branch
                 };

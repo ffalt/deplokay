@@ -29,6 +29,7 @@ export interface PublishActionOptions {
     publish: {
         branch?: {
             branch: string;
+            disableTag?: boolean;
         };
         folder?: {
             path: string;
