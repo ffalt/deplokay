@@ -65,6 +65,8 @@ export class PublishToBranchRun extends Run<PublishToBranchRunOptions> {
 			await destgit.tag([`v${version}`]);
 			await destgit.push('origin', opts.RELEASE_BRANCH);
 			await destgit.push('origin', '--tags');
+		} else {
+			await destgit.push('origin', opts.RELEASE_BRANCH);
 		}
 		await this.emit(EmitType.OPERATION, 'cleaning', `Cleaning up ${opts.RELEASE_DIR}`);
 		await fse.remove(opts.RELEASE_DIR);
