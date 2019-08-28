@@ -1,6 +1,6 @@
 {
   "name": "deplokay",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "deplokay is a deployment helper (CLI/Library) for node. Build a git repository with jekyll, hugo or npm & deploy to a folder, archive or branch",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -56,8 +56,8 @@
     "@types/semver": "^6.0.1",
     "@types/tmp": "^0.1.0",
     "rimraf": "^3.0.0",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "typescript-json-schema": "^0.39.0"
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.2",
+    "typescript-json-schema": "^0.40.0"
   }
 }
