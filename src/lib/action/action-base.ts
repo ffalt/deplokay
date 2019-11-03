@@ -3,7 +3,7 @@ import {EmitFunction} from '..';
 import {PublishToBranchRun, PublishToBranchRunOptions} from '../run/publish-branch';
 import {PublishToFolderRun, PublishToFolderRunOptions} from '../run/publish-folder';
 import {PublishToArchiveRun, PublishToArchiveRunOptions} from '../run/publish-archive';
-import {GitFolderRun, GitFolderOptions} from '../run/git-folder';
+import {GitFolderOptions, GitFolderRun} from '../run/git-folder';
 import {getGitSummary} from '../utils';
 
 /**
@@ -227,8 +227,12 @@ export abstract class PublishActionBase<T extends PublishActionOptions> {
 	protected async runSource(): Promise<{ build_path: string, version: string, name: string }> {
 		if (this.opts.source.remote) {
 			const git = new GitFolderRun(this.emit, this.task);
+			let GIT_REPO = this.opts.source.remote.repository;
+			if (GIT_REPO[0] === '.') {
+				GIT_REPO = path.resolve(GIT_REPO);
+			}
 			const gitOptions: GitFolderOptions = {
-				GIT_REPO: this.opts.source.remote.repository,
+				GIT_REPO,
 				GIT_DIR: path.resolve(this.opts.source.remote.checkout_path),
 				GIT_BRANCH: this.opts.source.remote.branch
 			};

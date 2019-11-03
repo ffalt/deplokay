@@ -95,8 +95,12 @@ class PublishActionBase {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.opts.source.remote) {
                 const git = new git_folder_1.GitFolderRun(this.emit, this.task);
+                let GIT_REPO = this.opts.source.remote.repository;
+                if (GIT_REPO[0] === '.') {
+                    GIT_REPO = path_1.default.resolve(GIT_REPO);
+                }
                 const gitOptions = {
-                    GIT_REPO: this.opts.source.remote.repository,
+                    GIT_REPO,
                     GIT_DIR: path_1.default.resolve(this.opts.source.remote.checkout_path),
                     GIT_BRANCH: this.opts.source.remote.branch
                 };

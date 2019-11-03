@@ -1,6 +1,6 @@
 {
 	"name": "deplokay",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"description": "deplokay is a deployment helper (CLI/Library) for node. Build a git repository with jekyll, hugo or npm & deploy to a folder, archive or branch",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -41,11 +41,11 @@
 	"dependencies": {
 		"archiver": "^3.1.1",
 		"chalk": "^2.4.2",
-		"commander": "^3.0.0",
+		"commander": "^4.0.0",
 		"download": "^7.1.0",
 		"fs-extra": "^8.1.0",
 		"semver": "^6.3.0",
-		"simple-git": "^1.124.0",
+		"simple-git": "^1.126.0",
 		"tmp-promise": "^2.0.2"
 	}
 }
