@@ -2,9 +2,17 @@ import path from 'path';
 import fse from 'fs-extra';
 import {buildEnv, shellSpawn} from '../utils';
 import {Run} from './run-base';
-import download from 'download';
 import {EmitType} from '../index';
 import {DEFAULT_HUGO_VERSION} from '../../consts';
+import {promisify} from 'util';
+import got from 'got';
+import unzipper from 'unzipper';
+import stream from 'stream';
+import fs from 'fs';
+// @ts-ignore
+import jaguar from 'jaguar';
+
+const pipeline = promisify(stream.pipeline);
 
 export interface BuildHugoOptions {
 	BUILD_SOURCE_DIR: string;
@@ -32,11 +40,38 @@ export class BuildHugoRun extends Run<BuildHugoOptions> {
 		await this.emit(EmitType.SUCCESS, 'build', '');
 	}
 
-	private async download(url: string, opts: BuildHugoOptions): Promise<void> {
+	private async downloadFile(url: string, destination: string): Promise<void> {
+		await pipeline(
+			got.stream(url),
+			fs.createWriteStream(destination)
+		);
+	}
+
+	private async unpack(archive: string, destination: string): Promise<void> {
+		let ext = path.extname(archive);
+		if (ext === '.zip') {
+			const stream = fs.createReadStream(archive);
+			await stream.pipe(unzipper.Extract({path: destination, verbose: true})).promise();
+		} else {
+			return new Promise<void>((resolve, reject) => {
+				const extract = jaguar.extract(archive, destination);
+				extract.on('error', (e: Error) => {
+					reject(e);
+				});
+				extract.on('end', () => {
+					resolve();
+				});
+			});
+		}
+	}
+
+	private async download(url: string, filename: string, opts: BuildHugoOptions): Promise<void> {
 		const hugo_dir = path.resolve(opts.BUILD_SOURCE_DIR, '.hugo');
 		await fse.ensureDir(hugo_dir);
 		await this.emit(EmitType.OPERATION, 'installing', `Installing Hugo ${opts.BUILD_EXTENDED ? 'extended ' : ''}into ${hugo_dir}`);
-		await download(url, hugo_dir, {extract: true});
+		const archive = path.join(hugo_dir, filename);
+		await this.downloadFile(url, archive);
+		await this.unpack(archive, hugo_dir);
 		await this.emit(EmitType.SUCCESS, 'installed', '');
 	}
 
@@ -59,8 +94,9 @@ export class BuildHugoRun extends Run<BuildHugoOptions> {
 		}
 		const githubReleaseUrl = `https://github.com/gohugoio/hugo/releases/download/v${version}/`;
 		const ext = process.platform === 'win32' ? 'zip' : 'tar.gz';
-		const url = `${githubReleaseUrl}hugo_${version}_${osData[process.platform]}-${osArch[process.arch]}.${ext}`;
-		await this.download(url, opts);
+		const filename = `hugo_${version}_${osData[process.platform]}-${osArch[process.arch]}.${ext}`
+		const url = `${githubReleaseUrl}${filename}`;
+		await this.download(url, filename, opts);
 	}
 
 	private async installExtended(opts: BuildHugoOptions): Promise<void> {
@@ -75,8 +111,9 @@ export class BuildHugoRun extends Run<BuildHugoOptions> {
 		}
 		const githubReleaseUrl = `https://github.com/gohugoio/hugo/releases/download/v${version}/`;
 		const ext = process.platform === 'win32' ? 'zip' : 'tar.gz';
-		const url = `${githubReleaseUrl}hugo_extended_${version}_${osData[process.platform]}-64bit.${ext}`;
-		await this.download(url, opts);
+		const filename = `hugo_extended_${version}_${osData[process.platform]}-64bit.${ext}`;
+		const url = `${githubReleaseUrl}${filename}`;
+		await this.download(url, filename, opts);
 	}
 
 	private async install(opts: BuildHugoOptions): Promise<void> {
