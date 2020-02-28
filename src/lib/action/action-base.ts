@@ -141,7 +141,8 @@ export interface PublishActionOptions {
 	 */
 	env?: {
 		/**
-		 * environment variables passed to jekyl, hugo and npm e.g.  "JEKYLL_ENV": "production"
+		 * environment variables passed to jekyll, hugo and npm e.g.  "JEKYLL_ENV": "production"
+		 * if you want to use a specific bundler for jekyll use "BUNDLE": "/your/path/to/bundle"
 		 */
 		[name: string]: string;
 	};
