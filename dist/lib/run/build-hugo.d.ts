@@ -10,6 +10,8 @@ export interface BuildHugoOptions {
 }
 export declare class BuildHugoRun extends Run<BuildHugoOptions> {
     private build;
+    private downloadFile;
+    private unpack;
     private download;
     private installSimple;
     private installExtended;

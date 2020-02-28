@@ -171,7 +171,7 @@ class DeplokayCLI {
             this.programOptions(commander_1.default);
             commander_1.default.parse(process.argv);
             if (commander_1.default.no_colors) {
-                chalk_1.default.enabled = false;
+                chalk_1.default.level = 0;
             }
             let options;
             if (commander_1.default.config) {

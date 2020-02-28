@@ -165,7 +165,7 @@ export class DeplokayCLI {
 		this.programOptions(program);
 		program.parse(process.argv);
 		if (program.no_colors) {
-			chalk.enabled = false;
+			chalk.level = 0;
 		}
 		let options: any;
 		if (program.config) {

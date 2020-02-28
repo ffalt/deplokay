@@ -16,9 +16,15 @@ const path_1 = __importDefault(require("path"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const utils_1 = require("../utils");
 const run_base_1 = require("./run-base");
-const download_1 = __importDefault(require("download"));
 const index_1 = require("../index");
 const consts_1 = require("../../consts");
+const util_1 = require("util");
+const got_1 = __importDefault(require("got"));
+const unzipper_1 = __importDefault(require("unzipper"));
+const stream_1 = __importDefault(require("stream"));
+const fs_1 = __importDefault(require("fs"));
+const jaguar_1 = __importDefault(require("jaguar"));
+const pipeline = util_1.promisify(stream_1.default.pipeline);
 class BuildHugoRun extends run_base_1.Run {
     build(opts) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,12 +40,39 @@ class BuildHugoRun extends run_base_1.Run {
             yield this.emit(index_1.EmitType.SUCCESS, 'build', '');
         });
     }
-    download(url, opts) {
+    downloadFile(url, destination) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield pipeline(got_1.default.stream(url), fs_1.default.createWriteStream(destination));
+        });
+    }
+    unpack(archive, destination) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let ext = path_1.default.extname(archive);
+            if (ext === '.zip') {
+                const stream = fs_1.default.createReadStream(archive);
+                yield stream.pipe(unzipper_1.default.Extract({ path: destination, verbose: true })).promise();
+            }
+            else {
+                return new Promise((resolve, reject) => {
+                    const extract = jaguar_1.default.extract(archive, destination);
+                    extract.on('error', (e) => {
+                        reject(e);
+                    });
+                    extract.on('end', () => {
+                        resolve();
+                    });
+                });
+            }
+        });
+    }
+    download(url, filename, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const hugo_dir = path_1.default.resolve(opts.BUILD_SOURCE_DIR, '.hugo');
             yield fs_extra_1.default.ensureDir(hugo_dir);
             yield this.emit(index_1.EmitType.OPERATION, 'installing', `Installing Hugo ${opts.BUILD_EXTENDED ? 'extended ' : ''}into ${hugo_dir}`);
-            yield download_1.default(url, hugo_dir, { extract: true });
+            const archive = path_1.default.join(hugo_dir, filename);
+            yield this.downloadFile(url, archive);
+            yield this.unpack(archive, hugo_dir);
             yield this.emit(index_1.EmitType.SUCCESS, 'installed', '');
         });
     }
@@ -63,8 +96,9 @@ class BuildHugoRun extends run_base_1.Run {
             }
             const githubReleaseUrl = `https://github.com/gohugoio/hugo/releases/download/v${version}/`;
             const ext = process.platform === 'win32' ? 'zip' : 'tar.gz';
-            const url = `${githubReleaseUrl}hugo_${version}_${osData[process.platform]}-${osArch[process.arch]}.${ext}`;
-            yield this.download(url, opts);
+            const filename = `hugo_${version}_${osData[process.platform]}-${osArch[process.arch]}.${ext}`;
+            const url = `${githubReleaseUrl}${filename}`;
+            yield this.download(url, filename, opts);
         });
     }
     installExtended(opts) {
@@ -80,8 +114,9 @@ class BuildHugoRun extends run_base_1.Run {
             }
             const githubReleaseUrl = `https://github.com/gohugoio/hugo/releases/download/v${version}/`;
             const ext = process.platform === 'win32' ? 'zip' : 'tar.gz';
-            const url = `${githubReleaseUrl}hugo_extended_${version}_${osData[process.platform]}-64bit.${ext}`;
-            yield this.download(url, opts);
+            const filename = `hugo_extended_${version}_${osData[process.platform]}-64bit.${ext}`;
+            const url = `${githubReleaseUrl}${filename}`;
+            yield this.download(url, filename, opts);
         });
     }
     install(opts) {

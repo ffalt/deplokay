@@ -10,6 +10,11 @@ export interface BuildJekyllOptions {
 	BUILD_ENV?: { [name: string]: string };
 }
 
+export interface ExecOptions {
+	cwd: string;
+	env: { [name: string]: any };
+}
+
 export class BuildJekyllRun extends Run<BuildJekyllOptions> {
 
 	private hasBuildErrorMsg(text: string): boolean {
@@ -21,12 +26,14 @@ export class BuildJekyllRun extends Run<BuildJekyllOptions> {
 		return !!text.match(reg);
 	}
 
+	private getBundler(opts: BuildJekyllOptions): string {
+		return ((opts.BUILD_ENV || {})['BUNDLE']) || 'bundle';
+	}
+
 	private async build(opts: BuildJekyllOptions): Promise<void> {
+		const bundle = this.getBundler(opts);
 		await this.emit(EmitType.OPERATION, 'building', `Building Jekyll ${opts.BUILD_SOURCE_DIR}`);
-		const exec_options: {
-			cwd: string;
-			env: { [name: string]: any };
-		} = {
+		const exec_options: ExecOptions = {
 			cwd: opts.BUILD_SOURCE_DIR,
 			env: buildEnv(opts.BUILD_ENV)
 		};
@@ -35,7 +42,7 @@ export class BuildJekyllRun extends Run<BuildJekyllOptions> {
 		exec_options.env['BUNDLE_GEMFILE'] = gemfile;
 		let result = '';
 		try {
-			await shellSpawn('bundle', ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s: string) => {
+			await shellSpawn(bundle, ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s: string) => {
 				result += s + '\n';
 				this.emit(EmitType.LOG, '', s);
 			});
@@ -73,24 +80,42 @@ gem 'github-pages'`;
 		}
 	}
 
+	private async isLegacyBundler(bundle: string, exec_options: ExecOptions): Promise<boolean> {
+		let version = '';
+		await shellSpawn(bundle, ['-v'], exec_options, (s: string) => {
+			version = s || '';
+		});
+		return version.includes('Bundler version 2.0') || version.includes('Bundler version 1.');
+	}
+
 	private async install(opts: BuildJekyllOptions): Promise<void> {
+		const bundle = this.getBundler(opts);
 		const gemfile = path.resolve(opts.BUILD_SOURCE_DIR, 'Gemfile');
 		await this.ensureGemfile(gemfile);
 		const jekyll_dir = path.resolve(opts.BUILD_SOURCE_DIR, '.gem');
 
 		await this.emit(EmitType.OPERATION, 'installing', `Installing Jekyll into ${jekyll_dir}`);
-		const exec_options: {
-			cwd: string;
-			env: { [name: string]: any };
-		} = {
+		const exec_options: ExecOptions = {
 			cwd: opts.BUILD_SOURCE_DIR,
 			env: buildEnv(opts.BUILD_ENV)
 		};
 		let result = '';
-		await shellSpawn('bundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s: string) => {
-			result += s + '\n';
-			this.emit(EmitType.LOG, '', s);
-		});
+		const isLegacy = await this.isLegacyBundler(bundle, exec_options);
+		if (isLegacy) {
+			await shellSpawn(bundle, ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s: string) => {
+				result += s + '\n';
+				this.emit(EmitType.LOG, '', s);
+			});
+		} else {
+			await shellSpawn(bundle, ['config', '--local', 'set', 'path', jekyll_dir], exec_options, (s: string) => {
+				result += s + '\n';
+				this.emit(EmitType.LOG, '', s);
+			});
+			await shellSpawn(bundle, ['install', '--gemfile=' + gemfile], exec_options, (s: string) => {
+				result += s + '\n';
+				this.emit(EmitType.LOG, '', s);
+			});
+		}
 		if (this.hasInstallErrorMsg(result)) {
 			return Promise.reject(result);
 		}

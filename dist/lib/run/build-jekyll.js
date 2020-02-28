@@ -25,8 +25,12 @@ class BuildJekyllRun extends run_base_1.Run {
         const reg = /(missing gem executables|Could not locate Gemfile|command not found|GemNotFound|error)/i;
         return !!text.match(reg);
     }
+    getBundler(opts) {
+        return ((opts.BUILD_ENV || {})['BUNDLE']) || 'bundle';
+    }
     build(opts) {
         return __awaiter(this, void 0, void 0, function* () {
+            const bundle = this.getBundler(opts);
             yield this.emit(__1.EmitType.OPERATION, 'building', `Building Jekyll ${opts.BUILD_SOURCE_DIR}`);
             const exec_options = {
                 cwd: opts.BUILD_SOURCE_DIR,
@@ -37,7 +41,7 @@ class BuildJekyllRun extends run_base_1.Run {
             exec_options.env['BUNDLE_GEMFILE'] = gemfile;
             let result = '';
             try {
-                yield utils_1.shellSpawn('bundle', ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s) => {
+                yield utils_1.shellSpawn(bundle, ['exec', 'jekyll', 'build', '-d', opts.BUILD_DEST_DIR], exec_options, (s) => {
                     result += s + '\n';
                     this.emit(__1.EmitType.LOG, '', s);
                 });
@@ -76,8 +80,18 @@ gem 'github-pages'`;
             }
         });
     }
+    isLegacyBundler(bundle, exec_options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let version = '';
+            yield utils_1.shellSpawn(bundle, ['-v'], exec_options, (s) => {
+                version = s || '';
+            });
+            return version.includes('Bundler version 2.0') || version.includes('Bundler version 1.');
+        });
+    }
     install(opts) {
         return __awaiter(this, void 0, void 0, function* () {
+            const bundle = this.getBundler(opts);
             const gemfile = path_1.default.resolve(opts.BUILD_SOURCE_DIR, 'Gemfile');
             yield this.ensureGemfile(gemfile);
             const jekyll_dir = path_1.default.resolve(opts.BUILD_SOURCE_DIR, '.gem');
@@ -87,10 +101,23 @@ gem 'github-pages'`;
                 env: utils_1.buildEnv(opts.BUILD_ENV)
             };
             let result = '';
-            yield utils_1.shellSpawn('bundle', ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s) => {
-                result += s + '\n';
-                this.emit(__1.EmitType.LOG, '', s);
-            });
+            const isLegacy = yield this.isLegacyBundler(bundle, exec_options);
+            if (isLegacy) {
+                yield utils_1.shellSpawn(bundle, ['install', '--gemfile=' + gemfile, '--path', jekyll_dir], exec_options, (s) => {
+                    result += s + '\n';
+                    this.emit(__1.EmitType.LOG, '', s);
+                });
+            }
+            else {
+                yield utils_1.shellSpawn(bundle, ['config', '--local', 'set', 'path', jekyll_dir], exec_options, (s) => {
+                    result += s + '\n';
+                    this.emit(__1.EmitType.LOG, '', s);
+                });
+                yield utils_1.shellSpawn(bundle, ['install', '--gemfile=' + gemfile], exec_options, (s) => {
+                    result += s + '\n';
+                    this.emit(__1.EmitType.LOG, '', s);
+                });
+            }
             if (this.hasInstallErrorMsg(result)) {
                 return Promise.reject(result);
             }
