@@ -21,6 +21,7 @@
     }
   },
   "env": {
+    "BUNDLE": "/usr/local/opt/ruby/bin/bundle",
     "JEKYLL_ENV": "production"
   }
 }
