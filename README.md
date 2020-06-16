@@ -51,7 +51,7 @@ Options:
   --mode <mode>                   kind of project to publish (npm|jekyll|hugo|copy)
   --local [path]                  [source.local] local git repository path
   --repository [url]              [source.remote] git repository url
-  --branch [name]                 [source.remote] branch to publish e.g. "master"
+  --branch [name]                 [source.remote] branch to publish e.g. "main"
   --checkout_path [path]          [source.remote] working directory to checkout and build
   --npm_release_component [name]  [build.npm] a file or folder name to copy to the release folder, e.g. "dist" or "package.json" (multiple --nc allowed) (default: [])
   --npm_release_folder [name]     [build.npm] a folder name to copy its content to the release folder, e.g. "dist"  (multiple --nf allowed) (default: [])
@@ -160,7 +160,7 @@ export interface PublishActionOptions {
 		 */
 		remote?: {
 			/**
-			 *  branch of the remote git e.g. "master"
+			 *  branch of the remote git e.g. "main"
 			 */
 			branch: string;
 			/**

@@ -1,13 +1,13 @@
 {
   "$schema": "../config-schema.json",
-  "id": "deplokay/master",
+  "id": "deplokay/main",
   "mode": "npm",
   "source": {
     "local": {
       "path": "."
     },
-    "r-emote": {
-      "branch": "master",
+    "remote": {
+      "branch": "main",
       "repository": "https://github.com/ffalt/deplokay.git",
       "checkout_path": "./data/deplokay/build"
     }

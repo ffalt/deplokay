@@ -36,7 +36,7 @@ export interface PublishActionOptions {
 		 */
 		remote?: {
 			/**
-			 *  branch of the remote git e.g. "master"
+			 *  branch of the remote git e.g. "main"
 			 */
 			branch: string;
 			/**
@@ -173,7 +173,7 @@ export abstract class PublishActionBase<T extends PublishActionOptions> {
 				return Promise.reject('Missing Option "source.remote.repository": Please provide a git repository');
 			}
 			if (!this.opts.source.remote.branch) {
-				return Promise.reject('Missing Option "source.remote.branch": Please provide a git branch e.g. "master"');
+				return Promise.reject('Missing Option "source.remote.branch": Please provide a git branch e.g. "main"');
 			}
 			if (!this.opts.source.remote.checkout_path) {
 				return Promise.reject('Invalid Option "source.remote.checkout_path": Please provide a path where to checkout and build the project');

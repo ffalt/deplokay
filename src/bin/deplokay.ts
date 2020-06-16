@@ -61,7 +61,7 @@ export class DeplokayCLI {
 			.option('--local [path]', '[source.local] local git repository path')
 
 			.option('--repository [url]', '[source.remote] git repository url')
-			.option('--branch [name]', '[source.remote] branch to publish e.g. "master"')
+			.option('--branch [name]', '[source.remote] branch to publish e.g. "main"')
 			.option('--checkout_path [path]', '[source.remote] working directory to checkout and build')
 
 			.option('--npm_release_component [name]', '[build.npm] a file or folder name to copy to the release folder, e.g. "dist" or "package.json" (multiple --nc allowed)', parameterList, [])

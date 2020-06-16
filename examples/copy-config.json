@@ -1,10 +1,10 @@
 {
   "$schema": "../config-schema.json",
-  "id": "copy-test/master",
+  "id": "copy-test/main",
   "mode": "copy",
   "source": {
     "remote": {
-      "branch": "master",
+      "branch": "main",
       "repository": "https://github.com/ffalt/ffalt.github.io.git",
       "checkout_path": "./data/copy-test/build"
     }

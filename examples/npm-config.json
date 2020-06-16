@@ -1,9 +1,9 @@
 {
   "$schema": "../config-schema.json",
-  "id": "npm-test/master",
+  "id": "npm-test/main",
   "source": {
     "remote": {
-      "branch": "master",
+      "branch": "main",
       "repository": "https://github.com/ffalt/mah.git",
       "checkout_path": "./data/npm-test/build"
     }
