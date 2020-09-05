@@ -3,9 +3,6 @@
   "id": "deplokay/main",
   "mode": "npm",
   "source": {
-    "local": {
-      "path": "."
-    },
     "remote": {
       "branch": "main",
       "repository": "https://github.com/ffalt/deplokay.git",
