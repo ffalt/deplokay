@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeplokayCLI = void 0;
 const commander_1 = __importDefault(require("commander"));
 const chalk_1 = __importDefault(require("chalk"));
 const path_1 = __importDefault(require("path"));
@@ -67,7 +68,7 @@ class DeplokayCLI {
             .option('--mode <mode>', 'kind of project to publish (npm|jekyll|hugo|copy)')
             .option('--local [path]', '[source.local] local git repository path')
             .option('--repository [url]', '[source.remote] git repository url')
-            .option('--branch [name]', '[source.remote] branch to publish e.g. "master"')
+            .option('--branch [name]', '[source.remote] branch to publish e.g. "main"')
             .option('--checkout_path [path]', '[source.remote] working directory to checkout and build')
             .option('--npm_release_component [name]', '[build.npm] a file or folder name to copy to the release folder, e.g. "dist" or "package.json" (multiple --nc allowed)', parameterList, [])
             .option('--npm_release_folder [name]', '[build.npm] a folder name to copy its content to the release folder, e.g. "dist"  (multiple --nf allowed)', parameterList, [])

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PublishActionBase = void 0;
 const path_1 = __importDefault(require("path"));
 const publish_branch_1 = require("../run/publish-branch");
 const publish_folder_1 = require("../run/publish-folder");
@@ -45,7 +46,7 @@ class PublishActionBase {
                     return Promise.reject('Missing Option "source.remote.repository": Please provide a git repository');
                 }
                 if (!this.opts.source.remote.branch) {
-                    return Promise.reject('Missing Option "source.remote.branch": Please provide a git branch e.g. "master"');
+                    return Promise.reject('Missing Option "source.remote.branch": Please provide a git branch e.g. "main"');
                 }
                 if (!this.opts.source.remote.checkout_path) {
                     return Promise.reject('Invalid Option "source.remote.checkout_path": Please provide a path where to checkout and build the project');

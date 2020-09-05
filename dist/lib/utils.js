@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildEnv = exports.shellSpawn = exports.getManifestVersion = exports.getManifest = exports.getGitSummary = exports.createAndPushEmptyBranch = exports.checkoutRemoteBranch = exports.hasRemoteBranch = exports.setRemoteUrl = exports.getRemoteUrl = exports.cloneLocalGit = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const semver_1 = __importDefault(require("semver"));

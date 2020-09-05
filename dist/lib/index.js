@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmitType = void 0;
 var EmitType;
 (function (EmitType) {
     EmitType[EmitType["ERROR"] = 0] = "ERROR";

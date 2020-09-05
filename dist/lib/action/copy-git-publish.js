@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CopyPublishAction = void 0;
 const action_base_1 = require("./action-base");
 class CopyPublishAction extends action_base_1.PublishActionBase {
     run() {
