@@ -5,7 +5,7 @@
   "source": {
     "remote": {
       "branch": "main",
-      "repository": "https://github.com/ffalt/deplokay.git",
+      "repository": "git@github.com:ffalt/deplokay.git",
       "checkout_path": "./data/deplokay/build"
     }
   },
